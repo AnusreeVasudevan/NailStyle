@@ -1,7 +1,8 @@
 const User = require("../models/userModel");
+const Category = require("../models/categoryModel");
 const bcrypt = require('bcrypt');
-const randomstring = require('randomstring');
-const securePassword = require('secure-password');
+// const randomstring = require('randomstring');
+// const securePassword = require('secure-password');
 
 const loadLogin = async(req,res)=>{
     try{
@@ -134,7 +135,17 @@ const unblockUser = async (req, res) => {
   }
 };
 
-  
+const loadCategory = async(req,res)=>{
+  try{
+    const category = await Category.find({});
+    console.log(category);
+
+      res.render('category',{category});
+  } catch(error){
+      console.log(error.message);
+  }
+}
+
 
 module.exports = {
     loadLogin,
@@ -143,5 +154,6 @@ module.exports = {
     logout,
     listUser,
     blockUser,
-    unblockUser
+    unblockUser,
+    loadCategory
 }

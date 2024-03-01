@@ -155,5 +155,5 @@ module.exports = {
     listUser,
     blockUser,
     unblockUser,
-    loadCategory
+    loadCategory,
 }

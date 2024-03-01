@@ -1,6 +1,8 @@
 const User = require('../models/userModel');
 const bcrypt = require("bcrypt");
 const {sendInsertOtp} = require("../util/insertotp");
+const ProductModel=require('../models/productModel');
+const categoryModel=require('../models/categoryModel');
 
 // Import necessary modules
 const {generateOTP} = require('../util/otpgenerator'); // Import OTP generator function
@@ -118,7 +120,11 @@ const getOtp = async(req,res)=>{
 
 const loadHome = async(req,res)=>{
     try{
-        res.render('home');
+       const product=await ProductModel.find();
+       if(!product){
+        product=null;
+       }
+        res.render('home',{product});
     }catch(error){
         console.log(error.message);
     }
@@ -153,7 +159,7 @@ const verifyLogin = async(req,res)=>{
             return res.redirect('/login');
         }
         if(email===userData.email && hashedPassword ){
-            req.session.user = userData;
+            req.session.user = userData._id;
             console.log(req.session.user);
             console.log("OKOKOKOK")
             res.redirect('/home');
@@ -165,47 +171,40 @@ const verifyLogin = async(req,res)=>{
     }
 }
 
-// const resendOtp = async (req, res) => {
-//     try {
-//       if (req.session.data && req.session.data.email) {
-//         sentOtp(req, req.session.data.email); 
-//         res.status(200).json({
-//           status: true
-//         });
-//       } else {
-//         console.error('Error resending OTP: req.session.data or req.session.data.email is undefined');
-//         res.status(500).json({
-//           status: false,
-//           message: 'Error resending OTP'
-//         });
-//       }
-//     } catch (error) {
-//       console.error('Error resending OTP:', error);
-//       res.status(500).json({
-//         status: false,
-//         message: 'Error resending OTP'
-//       });
-//     }
-// };
-
-// const resendOtp = async (req, res) => {
-//     try {
-//         // Generate OTP
-//         const otp = generateOTP();
-//         console.log(otp);
-
-//         const sentEmail = await sendInsertOtp(req.session.Data.email, otp);
-//         if (sentEmail) {
-//             res.redirect('/verifyOTP');
-//         }
-//     } catch (error) {
-//         console.log('otp', error.message);
-//         // Handle the error appropriately
-//         res.status(500).send('Internal Server Error');
-//     }
-// };
 
 
+let resendOtp = async (req, res) => {
+    try {
+        const otp = generateOTP();
+        // console.log(req.session.Data.email,otp);
+         await sendInsertOtp(req.session.Data.email, otp);
+    
+            req.session.Data.otp=otp;
+            res.status(200).json({
+                status: true
+              })
+              
+      
+      
+    } catch (error) {
+      console.error('Error resending OTP:', error);
+      res.status(500).json({
+        status: false,
+        message: 'Error resending OTP'
+      });
+    }
+  };
+
+
+  const userLogout = async(req,res)=>{
+
+    try{
+        req.session.user=false;
+        res.redirect('/');
+    }catch(error){
+        console.log(error.message)
+    }
+}
 
 
 
@@ -217,5 +216,7 @@ module.exports = {
     getOtp,
     loadHome,
     verifyLogin,
-    // resendOtp
+    resendOtp,
+    userLogout,
+    
 }

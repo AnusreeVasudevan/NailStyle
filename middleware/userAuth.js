@@ -16,15 +16,28 @@ const isLogout = async(req,res,next)=>{
 
         if(req.session.user){
             res.redirect('/home')
+        }else{
+            next();
         }
-        next();
+        
     }
     catch(error){
         console.log(error.message);
     }
 }
 
+const checkAuth = (req, res, next) => {
+    if (req.session.user) {
+        // User is logged in, proceed
+        next();
+    } else {
+        // User is not logged in, redirect to login page
+        res.redirect('/login');
+    }
+};
+
 module.exports = {
     isLogin,
-    isLogout
+    isLogout,
+    checkAuth
 }

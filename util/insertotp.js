@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 
 const sendInsertOtp = async (email, otp) => {
     const mailOptions = {
-        from: '"NailStyle" <anusree.2040@gmail.com>',
+        from: '"NailStyle" <babsauto958@gmail.com>',
         to: email,
         subject: 'Your one time password , NailStyle',
         text: `Hi, Your OTP is ${otp}`
@@ -29,7 +29,7 @@ const sendInsertOtp = async (email, otp) => {
         console.log('hiiiiiiiiiiiiiiiiiiiii');
         const info = await transporter.sendMail(mailOptions);
         console.log("Email send Successfull: ", info.response);
-        console.log(otp, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      console.log(otp);
         return otp;
     } catch (error) {
         console.error('Error sending OTP email:', error);

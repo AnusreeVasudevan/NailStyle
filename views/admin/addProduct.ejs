@@ -100,7 +100,7 @@
                             <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                            <a class="dropdown-item text-danger" href="/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
                         </div>
                     </li>
                 </ul>
@@ -132,14 +132,14 @@
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label for="regular_price" class="form-label">Price</label>
-                                            <input placeholder="$" type="text" class="form-control" name="price" id="regular_price">
+                                            <input placeholder="₹" type="text" class="form-control" name="price" id="regular_price">
                                             <p id="priceError" class="text-danger"></p> <!-- Placeholder for price error -->
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label for="discount_price" class="form-label">Discount Price</label>
-                                            <input placeholder="$" type="text" class="form-control" name="discountPrice" id="discount_price">
+                                            <input placeholder="₹" type="text" class="form-control" name="discountPrice" id="discount_price">
                                             <p id="discountPriceError" class="text-danger"></p> <!-- Placeholder for discount price error -->
                                         </div>
                                     </div>
@@ -157,7 +157,7 @@
                                         <% if(category.length > 0) {
                                             for(let i=0; i<category.length; i++) { %>
                                         <label class="mb-2 form-check form-check-inline" style="width: 45%;">
-                                            <input class="form-check-input" value="<%=category[i]._id%>" name="category" id="category_<%= i %>" type="checkbox">
+                                            <input class="form-check-input" value="<%=category[i]._id%>" name="category" id="category_<%= i %>" type="radio">
                                             <span class="form-check-label"> <%=category[i].name%> </span>
                                         </label>
                                         <%}}%>
@@ -190,7 +190,7 @@
                             <th>Images</th>
                             <th>Category</th>
                             <th>Price</th>
-                            <th>Discount Price</th> <!-- Added Discount Price Column -->
+                            <th>Discount Price</th>
                             <th>Stock</th>
                             <th>Status</th>
                             <th>Actions</th>

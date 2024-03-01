@@ -51,6 +51,7 @@ admin_route.post('/product',upload,productController.addProduct);
 admin_route.get('/active',productController.activeStatus)
 admin_route.get('/editproduct',productController.loadEdit);
 admin_route.post('/editproduct',upload,productController.editProduct);
+admin_route.get('/logout',adminController.logout);
 
 
 

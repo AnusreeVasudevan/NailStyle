@@ -146,6 +146,8 @@ const loadIndividualProduct = async (req, res) => {
 
         const id = req.query.id;
         const productData = await productModel.findById({ _id: id}).populate('category');
+        const relatedProducts = await productModel.find({ category: productData.category }).limit(5);
+        console.log(relatedProducts,"relatedproduct");
         console.log(productData,'pdt.............');
         const categoryData = await categoryModel.find({});
         console.log(categoryData,'category................');
@@ -153,7 +155,7 @@ const loadIndividualProduct = async (req, res) => {
         if (productData) {
             res.render('productDetails', {
                 product: productData,
-                category:category.name
+                category:category.name,relatedProducts
             })
         }
         else {
@@ -166,6 +168,14 @@ const loadIndividualProduct = async (req, res) => {
     }
 }
 
+// const fetchRelatedProducts = async (categoryId, limit) => {
+//     try {
+//         const relatedProducts = await productModel.find({ category: categoryId }).limit(limit);
+//         return relatedProducts;
+//     } catch (error) {
+//         throw new Error(`Error fetching related products: ${error.message}`);
+//     }
+// };
 
 
 

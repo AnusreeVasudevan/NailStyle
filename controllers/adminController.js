@@ -14,7 +14,7 @@ const loadLogin = async(req,res)=>{
 
 const logout = async(req,res)=>{
   try{
-      req.session.destroy();
+      req.session.user_id =false;
       res.redirect('/admin');
   }catch(error){
       console.log(error.message);

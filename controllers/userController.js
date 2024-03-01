@@ -208,6 +208,8 @@ let resendOtp = async (req, res) => {
 
 
 
+
+
 module.exports = {
     loginLoad,
     loadRegister,

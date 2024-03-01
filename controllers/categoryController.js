@@ -5,10 +5,21 @@ const createCategory = async (req, res) => {
     try {
         const name = req.body.name;
         const dis = req.body.description;
+        const existingcate = await Category.findOne({
+        
+            name: name.toLowerCase(),
+        
+      });
+      //console.log(existingUser);
+      if(existingcate ){
+        const categorydetails = await Category.find();
+          res.render('category',{category:categorydetails,message:'name is already entered'})
+      }
+else{
 
         // Create a new category object with the provided name and description
         const cat = new Category({
-            name: name,
+            name: name.toLowerCase(),
             description: dis 
         });
 
@@ -16,7 +27,7 @@ const createCategory = async (req, res) => {
         const catData = await cat.save();
 
         // Respond with a success status
-        res.redirect('/admin/category');
+        res.redirect('/admin/category');}
       
     } catch (error) {
         // Log any errors that occur during the process

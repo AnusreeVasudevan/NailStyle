@@ -187,7 +187,7 @@
 
                             <!-- Start Header Action Link -->
                             <ul class="header-action-link action-color--black action-hover-color--golden">
-                                <li>
+                                <!-- <li>
                                     <a href="#offcanvas-wishlish" class="offcanvas-toggle">
                                         <i class="icon-heart"></i>
                                         <span class="item-count">3</span>
@@ -208,7 +208,7 @@
                                     <a href="#offcanvas-about" class="offacnvas offside-about offcanvas-toggle">
                                         <i class="icon-menu"></i>
                                     </a>
-                                </li>
+                                </li> -->
                             </ul>
                             <!-- End Header Action Link -->
                         </div>
@@ -440,11 +440,11 @@
                 <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
             </ul>
 
-            <ul class="user-link">
+            <!-- <ul class="user-link">
                 <li><a href="wishlist.html">Wishlist</a></li>
                 <li><a href="cart.html">Cart</a></li>
                 <li><a href="checkout.html">Checkout</a></li>
-            </ul>
+            </ul> -->
         </div>
         <!-- End Mobile contact Info -->
     </div> <!-- ...:::: End Offcanvas Mobile Menu Section:::... -->
@@ -614,7 +614,7 @@
     <div class="offcanvas-overlay"></div>
 
     <!-- ...:::: Start Breadcrumb Section:::... -->
-    <div class="breadcrumb-section breadcrumb-bg-color--golden" style="background-color:black;">
+    <!-- <div class="breadcrumb-section breadcrumb-bg-color--golden" style="background-color:black;">
         <div class="breadcrumb-wrapper">
             <div class="container">
                 <div class="row">
@@ -624,7 +624,20 @@
                 </div>
             </div>
         </div>
-    </div> <!-- ...:::: End Breadcrumb Section:::... -->
+    </div> ...:::: End Breadcrumb Section:::... -->
+
+    <div class="breadcrumb-section breadcrumb-bg-color--golden" style="background-image: url('assets/images/carosal/cover.webp');">
+        <div class="breadcrumb-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="breadcrumb-title" style="color: #607D3B;">Nail Style</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     <!-- ...:::: Start Customer Login Section :::... -->
     <div class="customer-login">
@@ -634,21 +647,33 @@
                 <div class="col-lg-6 col-md-6">
                     <div class="account_form" data-aos="fade-up" data-aos-delay="0">
                         <h3>login</h3>
-                        <form action="/login" method="POST" style="border-style: solid;border-color: black; border-width: 3px;" onclick="return validateForm()">
+                        <form action="/login" method="POST" style="border-style: solid; border-color: black; border-width: 3px;" onclick="return validateForm()">
                             <div class="default-form-box">
+                                <% if (messages && messages.length > 0) { %>
+                                    <% messages.forEach(message => { %>
+                                        <div class="alert alert-danger" role="alert">
+                                            <%= message %>
+                                        </div>
+                                    <% }); %>
+                                <% } %>
+                        
                                 <label>email <span>*</span></label>
-                                <input type="text" name="email" id="email" value="anilacbenny810@gmail.com" style="border-style: solid;border-color: rgb(41, 37, 37); border-width: 1px;">
-                                <p id="emailError" class="text-danger">
+                                <input type="text" name="email" id="email" value="anilacbenny810@gmail.com" style="border-style: solid; border-color: rgb(41, 37, 37); border-width: 1px;">
+                                <p id="emailError" class="text-danger"></p>
                             </div>
                             <div class="default-form-box">
                                 <label>Passwords <span>*</span></label>
-                                <input type="password" name="password" id="password" value="Anila@123" style="border-style: solid;border-color: rgb(41, 37, 37); border-width: 1px;">
+                                <input type="password" name="password" id="password" value="Anila@1234" style="border-style: solid; border-color: rgb(41, 37, 37); border-width: 1px;">
                                 <p id="passwordError" class="text-danger"></p>
+                                <!-- Forgot Password Link -->
+                                <a href="/emailforgotpassword" style="display: block; margin-top: 10px;">Forgot Password?</a>
                             </div>
                             <div class="login_submit">
                                 <button class="btn btn-md btn-black-default-hover mb-4" type="submit">login</button>
                             </div>
-                        </form><br>
+                        </form>
+                        
+                        <br>
                         <a href="/register">Sign Up</a>
                         <br><br>
                         <a href="/admin/">Login as Admin</a>

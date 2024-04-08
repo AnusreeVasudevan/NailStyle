@@ -614,12 +614,12 @@
     <div class="offcanvas-overlay"></div>
 
     <!-- ...:::: Start Breadcrumb Section:::... -->
-    <div class="breadcrumb-section breadcrumb-bg-color--golden" style="background-color:black;">
+    <div class="breadcrumb-section breadcrumb-bg-color--golden" style="background-image: url('assets/images/carosal/cover.webp');">
         <div class="breadcrumb-wrapper">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <h3 class="breadcrumb-title" style="color: white;">Nail Style</h3>
+                        <h3 class="breadcrumb-title" style="color: #607D3B;">Nail Style</h3>
                         <div class="breadcrumb-nav breadcrumb-nav-color--black breadcrumb-nav-hover-color--golden">
                             <nav aria-label="breadcrumb">
                                 <!-- <ul>
@@ -644,6 +644,13 @@
                 <div class="account_form" data-aos="fade-up" data-aos-delay="0">
                     <h3>OTP Verification</h3>
                     <form action="" method="POST">
+                        <% if (messages && messages.length> 0) { %>
+                            <% messages.forEach(message=> { %>
+                                <div class="alert alert-danger" role="alert">
+                                    <%= message %>
+                                </div>
+                                <% }); %>
+                                    <% } %>
                         <div class="default-form-box">
                             <label>Enter OTP <span>*</span></label>
                             <input type="text" name="otp" placeholder="Enter your OTP">

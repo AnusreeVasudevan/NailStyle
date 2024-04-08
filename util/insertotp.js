@@ -12,7 +12,11 @@ const transporter = nodemailer.createTransport({
     auth:{
         user:config.emailUser,
         pass:config.emailPasssword
-    }
+    },
+    tls: {
+        // Do not fail on invalid certs
+        rejectUnauthorized: false,
+    },
 });
 
 //sent otp to mail for forget password
@@ -26,7 +30,7 @@ const sendInsertOtp = async (email, otp) => {
     };
 
     try {
-        console.log('hiiiiiiiiiiiiiiiiiiiii');
+        console.log('Anusreeeeeeeeeee');
         const info = await transporter.sendMail(mailOptions);
         console.log("Email send Successfull: ", info.response);
       console.log(otp);

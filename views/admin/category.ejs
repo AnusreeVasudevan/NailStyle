@@ -23,7 +23,8 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="adminassets/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+                <img src="assets/images/carosal/logo.jpg" class="logo" alt="Evara Dashboard">
+                <h4 style="color: black;">Nail Style</h4>
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -45,8 +46,14 @@
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/category"> <!-- Placeholder link for Categories -->
-                        <i class="icon material-icons md-shopping_bag"></i>
+                        <i class="icon material-icons md-star"></i>
                         <span class="text">Categories</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/order"> <!-- Placeholder link for orders -->
+                        <i class="icon material-icons md-menu"></i>
+                        <span class="text">Orders</span>
                     </a>
                 </li>
             </ul>
@@ -55,7 +62,7 @@
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
-                <form class="searchform">
+                <!-- <form class="searchform">
                     <div class="input-group">
                         <input list="search_terms" type="text" class="form-control" placeholder="Search term">
                         <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
@@ -66,7 +73,7 @@
                         <option value="Apple iphone">
                         <option value="Ahmed Hassan">
                     </datalist>
-                </form>
+                </form> -->
             </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
@@ -111,10 +118,10 @@
             <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">Categories </h2>
-                    <p>Add, edit or delete a category</p>
+                    <!-- <p>Add, edit or delete a category</p> -->
                 </div>
                 <div>
-                    <input type="text" placeholder="Search Categories" class="form-control bg-white">
+                    <!-- <input type="text" placeholder="Search Categories" class="form-control bg-white"> -->
                 </div>
             </div>
           
@@ -154,32 +161,40 @@
                                     </thead>
                                     <tbody>
                                         <%
-                                    if(category.length>0) { for(let i=0; i<category.length; i++) { %>
-                                            <tr>
-                                                <td width="30%"><%= category[i].name %></td>
-                                                <td width="50%"><%= category[i].description %></td>
-                                                <td>
-                                                    <% if(category[i].is_active) { %> <!-- Assuming is_blocked is a boolean -->
-                                                        Active
-                                                    <% } else { %>
-                                                        Inactive
-                                                    <% } %>
-                                                </td>
-                                                <td width="60%">
-                                                <a href="/admin/edit-cate?id=<%=category[i]._id %>" class="btn btn-primary">Edit</a><br><br>
-                                                <a href="/admin/delete-cate?id=<%=category[i]._id %>" class="btn btn-primary">Delete</a>
-                                                
-                                             </td>
-                                            </tr>
-                                    <%
-                                        }
-                                    } else { %>
-                                        <tr>
-                                            <td colspan="4">Category Not Found</td>
-                                        </tr>
-                                    <%
-                                    }
-                                    %>
+    if(category.length > 0) {
+        for(let i = 0; i < category.length; i++) {
+%>
+            <tr>
+                <td width="30%"><%= category[i].name %></td>
+                <td width="50%"><%= category[i].description %></td>
+                <td>
+                    <% if(category[i].is_active) { %> <!-- Assuming is_active is a boolean -->
+                        Active
+                    <% } else { %>
+                        Inactive
+                    <% } %>
+                </td>
+                <td width="60%">
+                    <a href="/admin/edit-cate?id=<%= category[i]._id %>" class="btn btn-primary">Edit</a><br><br>
+                    <% if(category[i].is_active) { %>
+                        <!-- If category is active, show delete button -->
+                        <button onclick="toggleCategory('<%= category[i]._id %>', 'inactive')" class="btn btn-primary">Delete</button>
+                    <% } else { %>
+                        <!-- If category is inactive, show restore button -->
+                        <button onclick="toggleCategory('<%= category[i]._id %>', 'active')" class="btn btn-primary">Restore</button>
+                    <% } %>
+                </td>
+            </tr>
+<%
+        }
+    } else { 
+%>
+        <tr>
+            <td colspan="4">Category Not Found</td>
+        </tr>
+<%
+    }
+%>
                                     </tbody>
                                 </table>
                             </div>

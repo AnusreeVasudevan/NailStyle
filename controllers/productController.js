@@ -1,6 +1,7 @@
 const productModel = require("../models/productModel");
 const categoryModel = require('../models/categoryModel');
 const userModel = require('../models/userModel');
+const wishlistModel = require('../models/wishlistModel');
 
 const loadProduct = async (req, res) => {
     try {
@@ -25,7 +26,7 @@ const addProduct = async (req, res) => {
         const product = new productModel({
             name: req.body.name,
             description: req.body.description,
-            images: images, // Assuming req.files is an array of file objects
+            images: images,
             // brand: req.body.brand,
             countInStock: req.body.stock,
             category: req.body.category,
@@ -36,20 +37,15 @@ const addProduct = async (req, res) => {
 
         const savedProduct = await product.save();
 
-        // Fetch category details, assuming you need them for the response or further processing
         const categoryDetails = await categoryModel.find();
 
         if (savedProduct) {
-            // Redirect to the product list page in the admin panel if the product is saved successfully
             res.redirect('/admin/product');
         } else {
-            // If the product wasn't saved for some reason, render the admin product page with an error message
-            // This else block may be unnecessary since an unsaved product should throw an error caught by the catch block
             res.render('admin-product', { cate: categoryDetails, message: 'Error saving product.' });
         }
     } catch (error) {
         console.error('Error saving product:', error);
-        // Render or redirect with error information, depending on your error handling strategy
         res.status(500).send('Error saving product.');
     }
 };
@@ -78,8 +74,12 @@ const loadEdit = async (req, res) => {
         const id = req.query.id;
 
         // Retrieve the product data using the Product model
-        const proData = await productModel.findById(id);
-
+        const proData = await productModel.findById(id).populate('category');
+        if(req.query.delete){
+            proData.images = proData.images.filter(img => img.trim() !== req.query.delete.trim());
+            await proData.save();
+      
+        }
         // Retrieve the category data using the Category model
         const catData = await categoryModel.find({});
 
@@ -94,11 +94,13 @@ const loadEdit = async (req, res) => {
 
 const editProduct = async (req, res) => {
     try {
-
         let existingImages = [];
-        const existingProduct = await productModel.findById(req.query.id);
+        let existingProduct = await productModel.findById(req.query.id);
+        console.log(existingProduct);
+        
         const categorydetails = await categoryModel.find();
-
+        
+        
         // Existing images are retained unless new images are uploaded
         if (existingProduct && existingProduct.images && Array.isArray(existingProduct.images)) {
             existingImages = existingProduct.images;
@@ -114,7 +116,7 @@ const editProduct = async (req, res) => {
 
         // Limit images to 3
         if (allImages.length > 3) {
-            return res.render('editProduct', { cate: categorydetails, pro: existingProduct, message: 'Maximum 3 images per product' });
+            return res.render('editProduct', { cate: categorydetails, proData: existingProduct, message: 'Maximum 3 images per product' });
         } else {
             // Update the product with new data
             const updatedProduct = await productModel.findByIdAndUpdate(req.query.id, {
@@ -124,10 +126,10 @@ const editProduct = async (req, res) => {
                     images: allImages,
                     category: req.body.category,
                     price: req.body.price,
-                    discountPrice: req.body.discountPrice, // Ensure this field exists in your schema
+                    discountPrice: req.body.discountPrice,
                     countInStock: req.body.stock,
                 }
-            }, { new: true }); // {new: true} to return the updated object
+            }, { new: true }); 
 
             if (updatedProduct) {
                 return res.redirect('/admin/product');
@@ -143,48 +145,73 @@ const editProduct = async (req, res) => {
 
 const loadIndividualProduct = async (req, res) => {
     try {
-
         const id = req.query.id;
-        const productData = await productModel.findById({ _id: id}).populate('category');
+        const userId = req.session.user; // Or however you access the logged-in user's ID
+        const productData = await productModel.findById(id).populate('category');
         const relatedProducts = await productModel.find({ category: productData.category }).limit(5);
-        console.log(relatedProducts,"relatedproduct");
-        console.log(productData,'pdt.............');
-        const categoryData = await categoryModel.find({});
-        console.log(categoryData,'category................');
-        const category = categoryData.find(cat => cat._id.equals(productData.category._id));
+        
+        // Assuming you have correctly imported isProductInWishlist function
+        const isInWishlist = await isProductInWishlist(userId, id);
+
         if (productData) {
             res.render('productDetails', {
                 product: productData,
-                category:category.name,relatedProducts
-            })
+                category: productData.category.name,
+                relatedProducts,
+                isInWishlist
+            });
+        } else {
+            res.redirect('/home');
         }
-        else {
-            res.redirect('/home')
-        }
-    }
-    catch (error) {
+    } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error");
     }
+};
+
+// const loadIndividualProduct = async (req, res) => {
+//     try {
+
+//         const id = req.query.id;
+//         const productData = await productModel.findById(id).populate('category');
+//         const relatedProducts = await productModel.find({ category: productData.category }).limit(5);
+//         console.log(relatedProducts,"relatedproduct");
+//         console.log(productData,'pdt.............');
+//         const categoryData = await categoryModel.find({});
+//         console.log(categoryData,'category................');
+//         const category = categoryData.find(cat => cat._id.equals(productData.category._id));
+//         if (productData) {
+//             res.render('productDetails', {
+//                 product: productData,
+//                 category:category.name,relatedProducts
+//             })
+//         }
+//         else {
+//             res.redirect('/home')
+//         }
+//     }
+//     catch (error) {
+//         console.log(error.message,);
+//         res.status(500).send("Internal Server Error");
+//     }
+// }
+
+async function isProductInWishlist(userId, productId) {
+    const wishlist = await wishlistModel.findOne({ user: userId });
+    if (!wishlist) return false;
+    return wishlist.product.some(product => product.toString() === productId);
 }
 
-// const fetchRelatedProducts = async (categoryId, limit) => {
-//     try {
-//         const relatedProducts = await productModel.find({ category: categoryId }).limit(limit);
-//         return relatedProducts;
-//     } catch (error) {
-//         throw new Error(`Error fetching related products: ${error.message}`);
-//     }
-// };
 
 
-
-
+ 
 module.exports = {
     loadProduct,
     addProduct,
     activeStatus,
     loadEdit,
     editProduct,
-    loadIndividualProduct
+    loadIndividualProduct,
+    isProductInWishlist
+
 }

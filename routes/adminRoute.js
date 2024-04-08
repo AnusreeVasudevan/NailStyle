@@ -17,9 +17,10 @@ const auth = require("../middleware/adminAuth");
 admin_route.set('view engine','ejs');
 admin_route.set('views','./views/admin');
 
-const adminController = require('../controllers/adminController')
-const categoryController = require('../controllers/categoryController')
+const adminController = require('../controllers/adminController');
+const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
+const couponController = require('../controllers/couponController');
 
 const storage=multer.diskStorage({
     destination:function(req,file,cb){
@@ -43,15 +44,26 @@ admin_route.get('/block-user',auth.isLogin,adminController.blockUser);
 admin_route.get('/unblock-user',auth.isLogin,adminController.unblockUser);
 admin_route.get('/category',auth.isLogin,adminController.loadCategory);
 admin_route.post('/category',auth.isLogin,categoryController.createCategory);
-admin_route.get('/edit-cate',categoryController.editCategoryLoad);
+admin_route.get('/edit-cate',auth.isLogin,categoryController.editCategoryLoad);
 admin_route.post('/edit-cate',categoryController.updateCate);
-admin_route.get('/delete-cate',categoryController.deleteCate);
-admin_route.get('/product',productController.loadProduct);
+admin_route.get('/delete-cate',auth.isLogin,categoryController.deleteCate);
+admin_route.get('/product',auth.isLogin,productController.loadProduct);
 admin_route.post('/product',upload,productController.addProduct);
-admin_route.get('/active',productController.activeStatus)
-admin_route.get('/editproduct',productController.loadEdit);
+admin_route.get('/active',auth.isLogin,productController.activeStatus)
+admin_route.get('/editproduct',auth.isLogin,productController.loadEdit);
 admin_route.post('/editproduct',upload,productController.editProduct);
-admin_route.get('/logout',adminController.logout);
+admin_route.get('/logout',auth.isLogin,adminController.logout);
+admin_route.get('/order',adminController.loadorder);
+admin_route.get('/adminorderdetails',auth.isLogin,adminController.loadorderdetails);
+admin_route.post('/acceptcancel',adminController.requestAccept);
+admin_route.post('/rejectcancel',adminController.requestCancel);
+admin_route.post('/updateorderstatus',adminController.updateorder);
+admin_route.get('/coupon',couponController.listCoupons);
+admin_route.get('/createcoupon',couponController.loadcreatecoupon);
+admin_route.post('/createcoupon',couponController.createCoupon);
+admin_route.post('/togglecoupon',couponController.toggleCouponStatus);
+
+
 
 
 

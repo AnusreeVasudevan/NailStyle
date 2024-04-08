@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const session = require("express-session");
 const noCache = require("nocache");
-const flash = require("express-flash");
+const flash = require("connect-flash");
 const path = require("path");
 
 
@@ -25,6 +25,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use("/admin", express.static(path.join(__dirname, "public")));
 app.use('/uploads',express.static(path.join(__dirname, 'uploads')))
 
+app.use((req, res, next) => {
+    res.locals.messages = req.flash('error');
+    next();
+  });
 
 // User route
 const userRoute = require('./routes/userRoute');

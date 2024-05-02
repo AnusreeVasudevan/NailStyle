@@ -660,21 +660,6 @@
                                     <img src="/uploads/productImages/<%= product.images[i]%>" alt="">
                                 </div>
                                 <% } %>
-                                <!-- <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="assets/images/product/default/home-1/default-2.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="assets/images/product/default/home-1/default-3.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="assets/images/product/default/home-1/default-4.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="assets/images/product/default/home-1/default-5.jpg" alt="">
-                                </div>
-                                <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="assets/images/product/default/home-1/default-6.jpg" alt="">
-                                </div> -->
                             </div>
                         </div>
                         <!-- End Large Image -->
@@ -688,26 +673,6 @@
                                         alt="">
                                 </div>
                                 <% } %>
-                                <!-- <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="assets/images/product/default/home-1/default-2.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="assets/images/product/default/home-1/default-3.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="assets/images/product/default/home-1/default-4.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="assets/images/product/default/home-1/default-5.jpg"
-                                        alt="">
-                                </div>
-                                <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="assets/images/product/default/home-1/default-6.jpg"
-                                        alt="">
-                                </div> -->
                             </div>
                             <!-- Add Arrows -->
                             <div class="gallery-thumb-arrow swiper-button-next"></div>
@@ -723,13 +688,6 @@
                         <div class="product-details-text">
                             <h4 class="title"><%=product.name%></h4>
                             <div class="d-flex align-items-center">
-                                <!-- <ul class="review-star">
-                                    <li class="fill"><i class="ion-android-star"></i></li>
-                                    <li class="fill"><i class="ion-android-star"></i></li>
-                                    <li class="fill"><i class="ion-android-star"></i></li>
-                                    <li class="fill"><i class="ion-android-star"></i></li>
-                                    <li class="empty"><i class="ion-android-star"></i></li>
-                                </ul> -->
                                 <ul class="review-star">
                                     <% for (let i = 0; i < product.rating; i++) { %>
                                         <li class="fill"><i class="ion-android-star"></i></li>
@@ -759,13 +717,6 @@
                                 
                             <!-- Product Variable Single Item -->
                             <div class="d-flex align-items-center ">
-                                <!-- <div class="variable-single-item ">
-                                    <span>Quantity</span>
-                                    <div class="product-variable-quantity">
-                                        <input min="1" max="100" value="1" type="number">
-                                    </div>
-                                </div> -->
-
                                 <div class="product-add-to-cart-btn">
                                     <%if(product.countInStock===0){%>
                                         <a class="text-danger">Out Of Stock</a>

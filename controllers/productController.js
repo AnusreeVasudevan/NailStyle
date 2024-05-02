@@ -27,12 +27,10 @@ const addProduct = async (req, res) => {
             name: req.body.name,
             description: req.body.description,
             images: images,
-            // brand: req.body.brand,
             countInStock: req.body.stock,
             category: req.body.category,
             price: req.body.price,
             discountPrice: req.body.discountPrice,
-            // afterDiscount: Math.floor(parseInt(req.body.price) - (parseInt(req.body.price) * (parseInt(req.body.discountPrice) / 100)))
         });
 
         const savedProduct = await product.save();

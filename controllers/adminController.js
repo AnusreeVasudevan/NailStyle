@@ -3,8 +3,11 @@ const Category = require("../models/categoryModel");
 const bcrypt = require('bcrypt');
 const orderModel = require('../models/orderModel');
 const productModel = require('../models/productModel')
+const fs = require('fs');
 // const randomstring = require('randomstring');
 // const securePassword = require('secure-password');
+const puppeteer = require('puppeteer');
+const handlebars = require('handlebars');
 
 const loadLogin = async(req,res)=>{
     try{
@@ -68,17 +71,96 @@ const verifyAdmin = async (req, res) => {
   }
   
 
-const loadDashboard = async (req, res) => {
-    try {
-        console.log("hlooooooooooooo");
-    //   const userData = await User.findById({ _id: req.session.user_id })
-      res.render('adminhome');
+// const loadDashboard = async (req, res) => {
+//     try {
+//     //   const userData = await User.findById({ _id: req.session.user_id })
+//     const orders = await orderModel.find({}).populate('user');
+//       res.render('adminhome',{orders});
   
-    }
-    catch (error) {
-      console.log(error.message);
-    }
+//     }
+//     catch (error) {
+//       console.log(error.message);
+//       res.status(500).send('Internal Server Error');
+//     }
+//   }
+
+// const loadDashboard = async (req, res) => {
+//     try {
+//         const timeFrame = req.query.timeFrame;
+//         console.log(timeFrame,'timeframe');
+//         let filter = {};
+
+//         if (timeFrame) {
+//             const now = new Date();
+//             switch (timeFrame) {
+//                 case 'Daily':
+//                     filter.orderDate = { $gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()) };
+//                     break;
+//                 case 'Weekly':
+//                     const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+//                     filter.orderDate = { $gte: startOfWeek };
+//                     break;
+//                 case 'Monthly':
+//                     filter.orderDate = { $gte: new Date(now.getFullYear(), now.getMonth(), 1) };
+//                     break;
+//                 case 'Yearly':
+//                     filter.orderDate = { $gte: new Date(now.getFullYear(), 0, 1) };
+//                     break;
+//             }
+//         }
+
+//         const orders = await orderModel.find(filter).populate('user');
+//         res.render('adminhome', { orders });
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(500).send('Internal Server Error');
+//     }
+// };
+
+const loadDashboard = async (req, res) => {
+  try {
+      const timeFrame = req.query.value;  
+      console.log(timeFrame, 'timeframe');
+      let filter = {};
+
+      if (timeFrame) {
+        filter.orderDate = timeframeFn(timeFrame);
+      }
+
+      const orders = await orderModel.find(filter).populate('user');
+      console.log(orders,'orderssss');
+      console.log(timeFrame,'timeframeee');
+      res.render('adminhome', { orders,timeFrame}); // Adjust view name and data as required
+  } catch (error) {
+      console.error('Error loading dashboard:', error);
+      res.status(500).send('Error loading dashboard');
   }
+};
+
+function timeframeFn(timeFrame){
+  let now = new Date();  
+          now.setHours(0, 0, 0, 0); 
+          switch (timeFrame) {
+            case 'All':
+                  orderDate = { $gte: new Date(now.getFullYear(), 0, 1) };
+                  break;
+              case 'Daily':
+                  orderDate = { $gte: now };
+                  break;
+              case 'Weekly':
+                  let startOfWeek = new Date(now);
+                  startOfWeek.setDate(now.getDate() - now.getDay());
+                  orderDate = { $gte: startOfWeek };
+                  break;
+              case 'Monthly':
+                  orderDate = { $gte: new Date(now.getFullYear(), now.getMonth(), 1) };
+                  break;
+              case 'Yearly':
+                  orderDate = { $gte: new Date(now.getFullYear(), 0, 1) };
+                  break;
+          }
+          return orderDate;
+}
 
   const listUser = async(req,res)=>{
     try{
@@ -356,6 +438,143 @@ const updateorder=async(req,res)=>{
 
 }
 
+const createReport = async(req,res)=>{
+  console.log('entered!!!');
+  try{
+    let filter = {};
+    const {timeFrame} = req.body;
+    if (timeFrame) {
+      filter.orderDate = timeframeFn(timeFrame);
+    }
+
+    const orders = await orderModel.find(filter).populate('user');
+    console.log(orders,'reqqq');
+    const htmlContent = fs.readFileSync('./views/admin/order-list-pdf.ejs', 'utf8');
+        const template = handlebars.compile(htmlContent);
+
+        
+        let tableContent = `
+            <table class="table border my-5" style="font-size: 10px">
+                <thead>
+                    <tr class="bg-primary-subtle">
+                        <th scope="col">Order Id</th>
+                        <th scope="col">Billing Name</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Discount</th>
+                        <th scope="col">Order Status</th>
+                        <th scope="col">Payment Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        console.log(orders,'orderssss');
+        orders.forEach((item, index) => {
+          console.log(item,'order id ');
+            tableContent += `
+                <tr>
+                <td>${item.oId}</td>
+                <td>${item.user.name}</td>
+                <td>${item.orderDate}</td>
+                <td>${item.price}</td>
+                <td>${item.status}</td>
+                <td>${item.status}</td>
+                <td>${item.paymentMethod}</td>
+                </tr>
+            `;
+        });
+
+        tableContent += `
+                </tbody>
+            </table>
+        `;
+        const renderedHtml = template( {tableContent} );
+
+        const browser = await puppeteer.launch();
+        const paged = await browser.newPage();
+
+        const marginOptions = {
+            top: '1cm',
+            bottom: '1cm',
+            left: '1cm',
+            right: '1cm'
+        };
+
+        await paged.setContent(renderedHtml);
+        const pdfBuffer = await paged.pdf({
+            format: 'A4',
+            margin: marginOptions
+        });
+
+        await browser.close();
+
+        res.setHeader('Content-Disposition', 'inline; filename="Sales Report"');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+        res.status(500).json({ error: "Error generating PDF" });
+    }
+
+}
+
+const filterProducts = async (req, res) => {
+  console.log("Filtering products");
+  try {
+      let filter = {};
+      const type = req.query.type;
+
+      if (type === 'product') {
+          // Aggregate to find the most sold products by summing quantities sold
+          const productSales = await orderModel.aggregate([
+              { $unwind: "$items" },
+              { $group: {
+                  _id: "$items.productId",
+                  totalSold: { $sum: "$items.quantity" }
+              }},
+              { $sort: { totalSold: -1 } },
+              { $limit: 10 } // Adjust the limit as needed to show more or fewer products
+          ]);
+
+          console.log(productSales, "Product sales");
+
+          // Convert aggregated results to product IDs for the query
+          const productIds = productSales.map(sale => sale._id);
+          filter._id = { $in: productIds }; // Ensure that the filter is correctly formatted
+
+      } else if (type === 'category') {
+          // Aggregate to find the most sold categories
+          const categorySales = await orderModel.aggregate([
+              { $unwind: "$items" },
+              { $lookup: {
+                  from: "products", // Ensure this is the correct collection name in your DB
+                  localField: "items.productId",
+                  foreignField: "_id",
+                  as: "productDetails"
+              }},
+              { $unwind: "$productDetails" },
+              { $group: {
+                  _id: "$productDetails.category",
+                  totalSold: { $sum: "$items.quantity" }
+              }},
+              { $sort: { totalSold: -1 } },
+              { $limit: 1 }
+          ]);
+
+          if (categorySales.length > 0) {
+              filter.category = categorySales[0]._id;
+          }
+      }
+
+      const products = await productModel.find(filter).populate('category');
+      console.log(products,'..............');
+      res.json({status: true, products });
+  } catch (error) {
+      console.error("Error filtering products:", error);
+      res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
     loadLogin,
     loadDashboard,
@@ -369,5 +588,7 @@ module.exports = {
     loadorderdetails,
     requestAccept,
     requestCancel,
-    updateorder
+    updateorder,
+    createReport,
+    filterProducts
 }

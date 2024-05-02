@@ -755,9 +755,6 @@
                                             <td class="product_name"><a href="/productdetails?id=<%=cart.items[i].productId._id %>"><%=cart.items[i].productId.name%> </a></td>
                                             <td class="product-price">Rs.<%=cart.items[i].productId.discountPrice%>.00</td>
                                            
-
-                                            <!-- <td class="product_quantity"><label>Quantity</label> <input min="1"
-                                                    max="100" value="1" type="number"></td> -->
                                                     <td>
                                                         <div class="detail-qty radius m-auto">
                                                             <button onclick="changeQuantity('increase', '<%= cart.items[i].productId._id %>')">+</button>
@@ -767,8 +764,8 @@
                                                         </div>
                                                     </td>
                                                     
-                                                    <td class="product_total" id="carttotal">Rs.<%=cart.items[i].price%>.00</td>
-
+                                                    <!-- <td class="product_total" id="carttotal">Rs.<%=cart.items[i].price%>.00</td> -->
+                                                    <td class="product_total" id="total-<%= cart.items[i].productId._id %>">Rs.<%=cart.items[i].price%>.00</td>
                                                     <%}}}}%>
 
                                         </tr> <!-- End Cart Single Item-->
@@ -828,8 +825,15 @@
                                                             <!-- Add more details as needed -->
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <!-- Add Coupon Button -->
-                                                            <button type="button" class="btn btn-md btn-golden" onclick="addCoupon('<%= couponItem.code %>')">Add Coupon</button>
+                                                            <button class="couponBtn btn btn-md btn-golden" 
+                                                            data-coupon-code="<%= couponItem.code %>" 
+                                                            onclick="handleCouponClick(this)">
+                                                            <% if (cart && cart.isApplied && cart.coupon === couponItem.code) { %>
+                                                                Remove Coupon
+                                                            <% } else { %>
+                                                                Add Coupon
+                                                            <% } %>
+                                                        </button>                                                        
                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                         </div>
                                                     </div>
@@ -837,8 +841,8 @@
                                             </div>
                                             <!-- End of Modal Structure -->
                         
-                                        <% }); %>
-                                    </ul>
+                                            <% }); %>
+                                        </ul>
                                 <% } else { %>
                                     <p>No coupons available</p>
                                 <% } %>                                
@@ -870,15 +874,27 @@
                                         <p class="cart_amount">Not Applicable</p>
                                     <% } %>
                                 </div>
-                            
                                 <div class="cart_subtotal">
-                                    <p>Total</p>
-                                    <% if (cart && cart.items && cart.items.length > 0) { %>
-                                        <p class="cart_amount" id="carttotal3">Rs.<%= cart.billTotal + (cart.shipping > 0 ? cart.shipping : 0) %>.00</p>
+                                    <p>Discount</p>
+                                    <% if (cart && cart.isApplied && cart.billTotal > cart.discountPrice) { %>
+                                        <p class="cart_amount" id="carttotal3">-Rs.<%= (cart.billTotal - cart.discountPrice).toFixed(2) %></p>
                                     <% } else { %>
                                         <p class="cart_amount" id="carttotal3">Rs.0.00</p>
                                     <% } %>
                                 </div>
+                                <div class="cart_subtotal">
+                                    <p>Total</p>
+                                    <% if (cart && cart.items && cart.items.length > 0) { %>
+                                        <% if (cart.isApplied) { %>
+                                            <p class="cart_amount">Rs.<%= (cart.discountPrice + (cart.shipping > 0 ? cart.shipping : 0)).toFixed(2) %></p>
+                                        <% } else { %>
+                                            <p class="cart_amount">Rs.<%= (cart.billTotal + (cart.shipping > 0 ? cart.shipping : 0)).toFixed(2) %></p>
+                                        <% } %>
+                                    <% } else { %>
+                                        <p class="cart_amount">Rs.0.00</p>
+                                    <% } %>
+                                </div>
+                                
                                 <% if (cart && cart.items && cart.items.length > 0) { %>
                                     <% let allInStock = cart.items.every(item => item.productId.countInStock > 0); %>
                                     <% if (allInStock) { %>
@@ -893,6 +909,7 @@
                             
                         </div>
                         </div>
+                    
                     </div>
                 </div>
             </div>
@@ -1284,7 +1301,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <script>
+    <!-- <script>
         function changeQuantity(action, productId) {
             console.log("I am called with productId:", productId); // Check if function is being called and productId is passed
             if (!productId) {
@@ -1337,8 +1354,137 @@
                 console.error('Error:', error);
             });
         }
-        </script>
+        </script> -->
         
+
+
+
+
+
+        <!-- <script>
+            function changeQuantity(action, productId) {
+                console.log("I am called with productId:", productId); // Check if function is being called and productId is passed
+                if (!productId) {
+                    console.error('Product ID is undefined.');
+                    return; // Exit the function if productId is not provided
+                }
+        
+                const url = action === 'increase' ? '/increaseQty' : '/decreaseQty';
+                const data = { productId };
+                alert(url)
+                alert(data)
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(data) {
+                        console.log("Response data:", data); // Check response from server
+                        alert(data,'data vannu')
+                        alert('1')
+                        // Show sweet alert based on the response message
+                        if (data.message === 'Quantity increased') {
+                            alert('2')
+                            console.log("Showing maximum quantity alert");
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Maximum Quantity Reached',
+                                text: 'You have reached the maximum quantity allowed per user.',
+                                confirmButtonText: 'OK'
+                            });
+                        } else if (data.message === 'Stock limit exceeded') {
+                            console.log("Showing stock limit exceeded alert");
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Stock Limit Exceeded',
+                                text: 'The quantity you are trying to add exceeds the available stock.',
+                                confirmButtonText: 'OK'
+                            });
+                        } else if (data.message === 'Quantity decreased') {
+                            console.log("Showing minimum quantity alert");
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Minimum Quantity Reached',
+                                text: 'You have reached the minimum quantity allowed per user.',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            console.log("No alert to show");
+                            // Optionally refresh the page to reflect the changes
+                            // location.reload(); // Simple way to refresh the page and see the updated cart
+                            // Or better yet, update the UI dynamically here
+                        }
+                    },
+
+
+                    error: function(xhr, status, error) {
+                        console.error('Error:', status, error);
+                    }
+                });
+            }
+        </script> -->
+
+<script>
+    function changeQuantity(action, productId) {
+                console.log("I am called with productId:", productId); // Check if function is being called and productId is passed
+                if (!productId) {
+                    console.error('Product ID is undefined.');
+                    return; // Exit the function if productId is not provided
+                }
+        
+                const url = action === 'increase' ? '/increaseQty' : '/decreaseQty';
+                const data = { productId };
+                // alert(url)
+                // alert(data)
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(data) {
+                        console.log("Response data:", data); // Check response from server
+                        // alert(data,'data vannu')
+                        // alert('1')
+                        // Show sweet alert based on the response message
+                         if (data.status == 'maximum') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Maximum Quantity Reached',
+                        text: 'You have reached the maximum quantity allowed per user.',
+                        confirmButtonText: 'OK'
+                    });
+                } else if (data.status == 'stockexceed') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Stock Limit Exceeded',
+                        text: 'The quantity you are trying to add exceeds the available stock.',
+                        confirmButtonText: 'OK'
+                    });
+                } else if (data.status == 'Minimum') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Minimum Quantity Reached',
+                        text: 'You have reached the minimum quantity allowed per user.',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    // Refresh cart display logic here
+                    location.reload(); // Simple way to refresh the page and see the updated cart
+                }
+                    },
+
+
+                    error: function(xhr, status, error) {
+                        console.error('Error:', status, error);
+                    }
+                });
+            }
+</script>
+
+
+
+
+
         
 
 <!-- delete product -->
@@ -1416,7 +1562,78 @@
     </script>
 <% } %>
 
-        
+
+<script>
+    
+    function handleCouponClick(couponCode) {
+        var button = document.getElementById('couponBtn');
+        var buttonText = button.innerText.toLowerCase().trim();
+
+        if (buttonText === "add coupon") {
+            addCoupon(couponCode);
+        } else if (buttonText === "remove coupon") {
+            removeCoupon(couponCode);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+    var buttons = document.querySelectorAll('.couponBtn'); 
+    if (buttons) {
+        buttons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var couponCode = this.getAttribute('data-coupon-code');
+                var buttonText = this.innerText.toLowerCase().trim();
+                if (buttonText === "add coupon") {
+                    addCoupon(couponCode);
+                } else if (buttonText === "remove coupon") {
+                    removeCoupon(couponCode);
+                }
+            });
+        });
+    }
+});
+
+
+   
+    function addCoupon(couponCode) {
+        $.ajax({
+            url: '/apply-coupon',
+            type: 'POST',
+            data: { couponCode: couponCode },
+            success: function(response) {
+                $('#cartTotal').text('$' + response.newTotal.toFixed(2));
+                $('#couponBtn').text("Remove Coupon"); // Change button text
+                $('#couponBtn').attr('onclick', 'handleCouponClick("' + couponCode + '")'); // Update onclick function
+                alert(response.message);
+                $('.modal').modal('hide');
+                location.reload();
+            },
+            error: function(response) {
+                alert(response.responseJSON.message);
+            }
+        });
+    }
+
+    function removeCoupon(couponCode) {
+        $.ajax({
+            url: '/remove-coupon',
+            type: 'POST',
+            success: function(response) {
+                $('#cartTotal').text('$' + response.newTotal.toFixed(2));
+                $('#couponBtn').text("Add Coupon"); // Change button text
+                $('#couponBtn').attr('onclick', 'handleCouponClick("' + couponCode + '")'); // Update onclick function
+                alert(response.message);
+                $('.modal').modal('hide');
+                location.reload();
+            },
+            error: function(response) {
+                alert(response.responseJSON.message);
+            }
+        });
+    }
+</script>
+
+
 </body>
 
 

@@ -20,7 +20,7 @@ const cartSchema = new mongoose.Schema({
       min:[1, 'Quantity can not be less then 1.'],
       default: 1
       },
-    price: {
+    price: {//populate this using product id
       type:Number
     },
    
@@ -54,17 +54,6 @@ billTotal: {
 }, {
 timestamps: true
 })
-
-// cartSchema.pre('save', function(next) {
-
-//   const shippingCharge = this.billTotal > 499 ? 0 : 50; 
-
-//   this.shipping = shippingCharge;
-
-//   this.billTotal += this.shipping;
-
-//   next();
-// });
 
 
 const cartModel = mongoose.model('Cart',cartSchema);

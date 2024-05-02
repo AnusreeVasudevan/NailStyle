@@ -1,7 +1,7 @@
-const sessionSecret = "mysitesessionsecret";
+const sessionSecret = process.env.sessionSecret;
 
-const emailUser = "babsauto958@gmail.com";
-const emailPasssword = "eifb ribp dnly tsrb";
+const emailUser = process.env.emailUser;
+const emailPasssword = process.env.emailPasssword;
 
 module.exports = {
     sessionSecret,

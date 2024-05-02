@@ -48,7 +48,7 @@ admin_route.get('/edit-cate',auth.isLogin,categoryController.editCategoryLoad);
 admin_route.post('/edit-cate',categoryController.updateCate);
 admin_route.get('/delete-cate',auth.isLogin,categoryController.deleteCate);
 admin_route.get('/product',auth.isLogin,productController.loadProduct);
-admin_route.post('/product',upload,productController.addProduct);
+admin_route.post('/product',auth.isLogin,upload,productController.addProduct);
 admin_route.get('/active',auth.isLogin,productController.activeStatus)
 admin_route.get('/editproduct',auth.isLogin,productController.loadEdit);
 admin_route.post('/editproduct',upload,productController.editProduct);
@@ -62,6 +62,9 @@ admin_route.get('/coupon',couponController.listCoupons);
 admin_route.get('/createcoupon',couponController.loadcreatecoupon);
 admin_route.post('/createcoupon',couponController.createCoupon);
 admin_route.post('/togglecoupon',couponController.toggleCouponStatus);
+admin_route.post('/createreport',adminController.createReport);
+admin_route.get('/admin/filter-products', adminController.filterProducts);
+
 
 
 

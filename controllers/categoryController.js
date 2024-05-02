@@ -1,5 +1,6 @@
 const Category = require("../models/categoryModel");
 const bcrypt = require('bcrypt');
+const ProductModel = require("../models/productModel");
 
 const createCategory = async (req, res) => {
     try {
@@ -12,10 +13,11 @@ const createCategory = async (req, res) => {
       });
       //console.log(existingUser);
       if(existingcate ){
+        console.log(existingcate,"existing cat");
         const categorydetails = await Category.find();
           res.render('category',{category:categorydetails,message:'name is already entered'})
       }
-else{
+    else{
 
         // Create a new category object with the provided name and description
         const cat = new Category({
@@ -61,7 +63,35 @@ const editCategoryLoad = async (req, res) => {
 
 const updateCate = async(req,res)=>{
     try{
-      const Data=await Category.findByIdAndUpdate({_id:req.query.id},{$set:{ name:req.body.name,description:req.body.description}});
+        let val=req.body.discount
+      const Data = await Category.findByIdAndUpdate({_id:req.query.id},{$set:{ discount:req.body.discount,name:req.body.name,description:req.body.description}});
+      if(req.body.discount==0){
+        //const products = await ProductModel.findByIdAndUpdate({category:req.query.id})
+        //console.log(await ProductModel.find())
+        for (const product of products) {
+            product.discountPrice = product.price;
+            product.discount=0
+            console.log(product.discount)
+            await product.save();
+            console.log(product)
+        }
+      }
+      else{
+        val=(100-Number(val))/100
+        const products = await ProductModel.findByIdAndUpdate({category:req.query.id})
+        console.log(products)
+
+        for (const product of products) {
+            product.discountPrice = product.price;
+            product.discount=percent
+            product.discountPrice *= val;
+            await product.save();
+            console.log(product)
+
+        }
+      }
+
+
       console.log(Data);
       if(Data){
         res.redirect('/admin/category');
@@ -96,3 +126,4 @@ module.exports = {
     updateCate,
     deleteCate
 };
+//i need to convert object id, not the entire object

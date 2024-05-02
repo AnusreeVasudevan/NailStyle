@@ -6,6 +6,9 @@ const categoryModel=require('../models/categoryModel');
 const addressModel=require('../models/addressModel');
 const orderModel = require('../models/orderModel');
 const cartModel = require('../models/cartModel')
+const fs = require('fs');
+const handlebars = require('handlebars');
+const puppeteer = require('puppeteer');
 
 // Import necessary modules
 const {generateOTP} = require('../util/otpgenerator'); // Import OTP generator function
@@ -390,7 +393,7 @@ const loaduserprofile = async (req, res) => {
       const orders = await orderModel.find({ user: req.session.user }) || [];
       const user = await User.findById(req.session.user);
 
-      console.log( orders);
+      console.log( orders,'AAAAAAA');
       res.render('userProfile', { user, address, orders });
   } catch (error) {
       console.log('loaduserProfile Error:', error.message);
@@ -790,6 +793,143 @@ const cancelorder = async (req, res) => {
   }
 };
 
+const returnOrder = async (req, res) => {
+    try {
+        const { reason, oId } = req.body;
+
+        if (!reason || !oId) {
+            return res.status(400).json({ success: false, error: "Reason and orderId are required" });
+        }
+
+        const order = await orderModel.findOne({ oId });
+
+        if (!order) {
+            return res.status(404).json({ success: false, error: "Order not found" });
+        }
+
+        // Check if the order status is 'Delivered' to allow return request
+        if (order.status !== 'Delivered') {
+            return res.status(400).json({ success: false, error: "Cannot return order. Order is not delivered yet." });
+        }
+
+        // Add return request to the order
+        const newReturnRequest = {
+            type: 'Return',
+            status: 'Pending',
+            reason: reason
+        };
+        
+        order.requests.push(newReturnRequest);
+        await order.save();
+
+        res.json({ success: true, message: "Return request submitted successfully" });
+    } catch (error) {
+        console.error("returnOrder error:", error);
+        return res.status(500).json({ success: false, error: "Internal server error" });
+    }
+};
+
+const downloadInvoice = async(req,res)=>{
+    console.log("invoice downloaded");
+    try{
+        console.log(req.body)
+        console.log(req.params)
+        const  {oId}  = req.params;
+        const orders = await orderModel.findOne({oId:oId}).populate('user').populate('items.productId');
+        console.log("jhgsjdhga"+orders.deliveryAddress,'orderszzz');
+        const htmlContent = fs.readFileSync('./views/user/invoice-pdf.ejs', 'utf8');
+        const template = handlebars.compile(htmlContent);
+        let discount,shipping
+        if(orders.coupondiscount==NaN){
+            discount=orders.coupondiscount
+
+        }
+        else{
+            discount="NA"
+        }
+        if(orders.shipping==NaN){
+            shipping=orders.shipping
+
+        }
+        else{
+            shipping="NA"
+        }
+        const {HouseNo, Street, Landmark, pincode,city,district,State,Country}=orders.deliveryAddress
+
+        let addresscontent = `<p>Order Number: ${orders.oId}</p>
+        <p class="text-primary">Invoice To</p>
+        <h4>${orders.user.name}</h4>
+        <ul class="list-unstyled">
+            <li>${HouseNo}, ${Street}, ${Landmark} </li>
+            <li>${city}, ${ district}, ${State}</li>
+            <li>${Country} - ${pincode}</li>
+        </ul>`
+        
+        let tableContent = `
+            <table class="table border my-5" style="font-size: 10px">
+                <thead>
+                    <tr class="bg-primary-subtle">
+                        <th scope="col">Name</th>
+                        <th scope="col">Rate</th>
+                        <th scope="col" style="width:80px">Quantity</th>
+                        <th scope="col">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+console.log(orders,'1111111111111');
+        orders.items.forEach((item, index) => {
+            tableContent += `
+                <tr>
+                <td>${item.productId.name}</td>
+                <td>${item.productId.discountPrice}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price}</td>
+                </tr>
+            `;
+        });
+        tableContent += `
+                <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Total<br>Discounts<br>Shipping<br><span style="color:blue">Grand Total</span></td>
+                <td>${orders.billTotal}<br>${orders.discountPrice}<br>${shipping}<br><span style="color:blue">${orders.billTotal}</span></td>
+                </tr>
+            `;    
+        tableContent += `
+                </tbody>
+            </table>
+        `;
+        const renderedHtml = template( {tableContent,addresscontent} );
+
+        const browser = await puppeteer.launch();
+        const paged = await browser.newPage();
+
+        const marginOptions = {
+            top: '1cm',
+            bottom: '1cm',
+            left: '1cm',
+            right: '1cm'
+        };
+
+        await paged.setContent(renderedHtml);
+        const pdfBuffer = await paged.pdf({
+            format: 'A4',
+            margin: marginOptions
+        });
+
+        await browser.close();
+
+        res.setHeader('Content-Disposition', 'inline; filename="Invoice"');
+        res.setHeader('Content-Type', 'application/pdf');
+        console.log("chummmaaaa");
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+        res.status(500).json({ error: "Error generating PDF" });
+    }
+}
 
 module.exports = {
     loginLoad,
@@ -813,6 +953,8 @@ module.exports = {
     loadeditAddress,
     editAddress,
     deleteAddress,
-    cancelorder
+    cancelorder,
+    returnOrder,
+    downloadInvoice
     
 }

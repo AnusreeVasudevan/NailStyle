@@ -210,3 +210,43 @@
     
 </div>
 <%-include('footer')-%>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<button id="couponBtn" type="button"
+                                                                class="btn btn-md btn-golden"
+                                                                onclick="handleCouponClick('<%= couponItem.code %>')">
+                                                                <% if (cart && cart.isApplied &&
+                                                                    cart.appliedCoupon===couponItem.code) { %>
+                                                                    Remove Coupon
+                                                                    <% } else { %>
+                                                                        Add Coupon
+                                                                        <% } %>
+                                                            </button>
+
+
+
+
+
+
+
+<strong>Rs.<%=cart.billTotal%>.00</strong> //checkout ordertotal
+
+<span>Rs.<%=order.billTotal%>.00</span> // orderconfirmed subtotal

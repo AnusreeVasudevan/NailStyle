@@ -719,8 +719,8 @@
                             </li>
                             <li> <a href="#orders" data-bs-toggle="tab"
                                     class="nav-link btn btn-block btn-md btn-black-default-hover">Orders</a></li>
-                            <!-- <li><a href="#downloads" data-bs-toggle="tab"
-                                    class="nav-link btn btn-block btn-md btn-black-default-hover">Downloads</a></li> -->
+                            <li><a href="#wallet" data-bs-toggle="tab"
+                                    class="nav-link btn btn-block btn-md btn-black-default-hover">My Wallet</a></li>
                             <li><a href="#address" data-bs-toggle="tab"
                                     class="nav-link btn btn-block btn-md btn-black-default-hover">Addresses</a></li>
                             <!-- <li><a href="#account-details" data-bs-toggle="tab"
@@ -777,9 +777,9 @@
                                     <thead>
                                         <tr>
                                             <th>Date</th>
-                                            <th>Product Name</th>
-                                            <th>Status</th>
                                             <th>Order ID</th>
+                                            <th>Status</th>
+                                            <th>Amount</th>
                                             <th>Actions</th>
                                         </tr> 
                                     </thead>
@@ -793,7 +793,8 @@
                                                         </td>
                                                         <td><span class="success"><%= orders[i].status %></span></td>
                                                         <td><%= orders[i].billTotal %></td>
-                                                        <td><a href="orderdetails?id=<%=orders[i]._id %>" class="view">view</a></td>
+                                                        <td><a href="orderdetails?oId=<%=orders[i]._id %>" class="view">view</a></td>
+                                                        <!-- <td><a href="orderdetails?id=<%=orders[i]._id %>" class="view">view</a></td> -->
                                               
                                             </tr>
                                         <% } %>
@@ -804,8 +805,8 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="downloads">
-                            <h4>Downloads</h4>
+                        <!-- <div class="tab-pane fade" id="wallet">
+                            <h4>My Wallet</h4>
                             <div class="table_page table-responsive">
                                 <table>
                                     <thead>
@@ -832,7 +833,52 @@
                                     </tbody>
                                 </table>
                             </div>
+                        </div> -->
+                        <div class="tab-pane fade" id="wallet">
+                            <h4>My Wallet</h4>
+                            <div class="card-body">
+                                <h5>Wallet Balance:</h5>
+                                <h5 class="lead">INR 5000</h5>
+                                <div class="wallet-transactions" style="max-height: 200px; overflow-y: auto;">
+                                    <h5>Recent Transactions:</h5>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Amount</th>
+                                                <th>Reason</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-success">Credit</td>
+                                                <td>April 10, 2024</td>
+                                                <td>10:30 AM</td>
+                                                <td>+INR 1000</td>
+                                                <td>Deposit</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-danger">Debit</td>
+                                                <td>April 9, 2024</td>
+                                                <td>3:45 PM</td>
+                                                <td>-INR 500</td>
+                                                <td>Withdrawal</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-success">Credit</td>
+                                                <td>April 8, 2024</td>
+                                                <td>12:15 PM</td>
+                                                <td>+INR 2000</td>
+                                                <td>Refund</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="tab-pane" id="address">
                             <!-- <p>The following addresses will be used on the checkout page .</p> -->
                             <h5 class="billing-address">Address</h5>

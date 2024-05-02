@@ -17,7 +17,8 @@ const categorySchema = new mongoose.Schema({
     is_active:{
         type:Boolean,
         default:true
-    }
+    },
+    discount:Number
 });
 
 module.exports = mongoose.model('category',categorySchema);

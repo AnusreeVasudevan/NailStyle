@@ -633,7 +633,6 @@
                                         </div>
                                             </td>
                                             <td class="product_total">Rs.<%=order.items[i].price%>.00</td>
-                                        <!-- Include other item details in a similar fashion -->
                                     </tr>
                                     <% } %>
                                 </tbody>
@@ -651,11 +650,16 @@
                                             </td>
                                             <td>
                                                 <div class="text-right">
-                                                    <span>Rs.<%=order.billTotal%>.00</span>
+                                                    <span>
+                                                        <% if (order.discountPrice > 0) { %>
+                                                            Rs.<%= order.discountPrice %>.00
+                                                        <% } else { %>
+                                                            Rs.<%= order.billTotal %>.00
+                                                        <% } %>
+                                                    </span>
                                                 </div>
                                             </td>
                                         </tr>
-                                        <!-- Include other subtotal details if needed -->
                                     </tbody>
                                 </table>
                             </div>

@@ -170,7 +170,8 @@
                                                        orderItem.status === 'Processing' ? 'alert-primary' : 
                                                        orderItem.status === 'Shipped' ? 'alert-warning' : 
                                                        orderItem.status === 'Delivered' ? 'alert-success' : 
-                                                       orderItem.status === 'Canceled' ? 'alert-danger' : '' %>">
+                                                       orderItem.status === 'Canceled' ? 'alert-danger' : 
+                                                       orderItem.status === 'Returned' ? 'alert-dark' : '' %>">
                                                     <%= orderItem.status %>
                                                 </span>
                                             </td>

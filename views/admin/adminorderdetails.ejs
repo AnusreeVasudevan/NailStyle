@@ -376,45 +376,53 @@
                     <div class="card ">
                         <div class="card-header" style="font-weight: bolder;">General Details</div>
                         <div class="card-body">
-                            <form id="orderStatusForm"
-                                onsubmit="submitOrderStatusForm('<%= orders.oId %>'); return false;">
+                            <form id="orderStatusForm" onsubmit="submitOrderStatusForm('<%= orders.oId %>'); return false;">
                                 <label for="orderId" style="font-weight: bolder;">Order Id:</label><br>
                                 <%= orders.oId %><br /><br />
                                 <label for="orderDate" style="font-weight: bolder;">Order Date:</label><br>
-                                <input type="text" class="mt-2 mb-2 text-brand border-0"
-                                    value="<%= orders.orderDate %>" disabled /><br>
-
+                                <input type="text" class="mt-2 mb-2 text-brand border-0" value="<%= orders.orderDate %>" disabled /><br>
+                            
                                 <label for="orderStatus mt-4" style="font-weight: bolder;">Order Status:</label><br>
                                 <select name="orderStatus" class="form-select mt-2" data-live-search="true">
                                     <% switch (orders.status) {
                                         case 'Pending': %>
-                                    <option value="Pending" selected>Pending</option>
-                                    <option value="Processing">Processing</option>
-                                    <option value="Shipped">Shipped</option>
-                                    <option value="Delivered">Delivered</option>
-                                    <option value="Canceled">Canceled</option>
-                                    <% break;
+                                            <option value="Pending" selected>Pending</option>
+                                            <option value="Processing">Processing</option>
+                                            <option value="Shipped">Shipped</option>
+                                            <option value="Delivered">Delivered</option>
+                                            <option value="Canceled">Canceled</option>
+                                            <option value="Returned">Returned</option>
+                                        <% break;
                                         case 'Processing': %>
-                                    
-                                    <option value="Processing" selected>Processing</option>
-                                    <option value="Shipped">Shipped</option>
-                                    <option value="Delivered">Delivered</option>
-                                    <option value="Canceled">Canceled</option>
-                                    <% break;
+                                            <option value="Processing" selected>Processing</option>
+                                            <option value="Shipped">Shipped</option>
+                                            <option value="Delivered">Delivered</option>
+                                            <option value="Canceled">Canceled</option>
+                                            <option value="Returned">Returned</option>
+                                        <% break;
                                         case 'Shipped': %>
-                                    <option value="Shipped" selected>Shipped</option>
-                                    <option value="Delivered">Delivered</option>
-                                    <option value="Canceled">Canceled</option>
-                                    <% break;
-                                       case 'Canceled': %>
-                                    <option value="Canceled">Canceled</option>
-                                    <% break;                                                  
-                                        default: %>
-                                    <option value="Delivered">Delivered</option>
-                                    <% } %>
+                                            <option value="Shipped" selected>Shipped</option>
+                                            <option value="Delivered">Delivered</option>
+                                            <option value="Canceled">Canceled</option>
+                                            <option value="Returned">Returned</option>
+                                        <% break;
+                                        case 'Delivered': %>
+                                            <option value="Delivered" selected>Delivered</option>
+                                            <option value="Canceled">Canceled</option>
+                                            <option value="Returned">Returned</option>
+                                        <% break;
+                                        case 'Canceled': %>
+                                            <option value="Canceled" selected>Canceled</option>
+                                            <option value="Returned">Returned</option>
+                                        <% break;
+                                        case 'Returned': %>
+                                            <option value="Returned" selected>Returned</option>
+                                        <% break;
+                                    } %>
                                 </select><br>
                                 <button type="submit" class="btn btn-primary">Save Order</button>
                             </form>
+                            
 
 
                         </div>

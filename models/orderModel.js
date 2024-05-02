@@ -6,50 +6,44 @@ const orderSchema = new Schema({
       user: {
         type: ObjectID,
         ref: 'User',
-        required: true,
-      },
+       },
+       payId:{
+        type: String,
+       },
       cart: {
         type: ObjectID,
         ref: 'carts',
       },
       oId: {
         type: String,
-        required: true,
-      },
+       },
 
       items: [{
         productId: {
           type: ObjectID,
-          ref: 'products',
-          required: true,
-        },
+          ref: 'Products',
+           },
         image: {
           type: String,
-          required: true,
-        },
+           },
         name: {
           type: String,
-          required: true,
-        },
+           },
         productPrice: {
           type: Number,
-          required: true,
-        },
+           },
         quantity: {
           type: Number,
-          required: true,
-          min: [1, 'Quantity can not be less than 1.'],
+             min: [1, 'Quantity can not be less than 1.'],
           default: 1,
         },
         price: {
           type: Number,
-          required: true,
-        },
+           },
       }, ],
       billTotal: {
         type: Number,
-        required: true,
-      },
+       },
       paymentMethod: {
         type: String,
       },
@@ -59,7 +53,7 @@ const orderSchema = new Schema({
         default: 'Pending',
       },
       deliveryAddress: {
-        type: {
+        
           addressType: String,
           HouseNo: String,
           Street: String,
@@ -69,9 +63,8 @@ const orderSchema = new Schema({
           district: String,
           State: String,
           Country: String,
-        },
-        required: true,
-      },
+        
+       },
       orderDate: {
         type: Date,
         default: Date.now,
@@ -99,7 +92,7 @@ const orderSchema = new Schema({
         reason: String,
         // Add other fields as needed for your specific use case
       }, ],
-    coupon:{
+    coupon:{//display them seperately
         type:String
     },
     discountPrice:{

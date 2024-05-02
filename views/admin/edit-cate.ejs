@@ -129,13 +129,18 @@
                     <form id="categoryForm" method="post"> 
                         <div class="mb-4">
                             <label for="product_name" class="form-label">Name</label>
-                            <input type="text" placeholder="Type here" class="form-control" name="name" id="product_name" />
+                            <input type="text" placeholder="Type here" value="<%= category.name %>" class="form-control" name="name" id="product_name" />
                             <p id="nameError" class="text-danger"></p>
                         </div>
                         <div class="mb-4">
                             <label class="form-label">Description</label>
-                            <textarea placeholder="Type here" name="description" id="description" class="form-control"></textarea>
+                            <textarea placeholder="Type here" value="<%= category.description %>" name="description" id="description" class="form-control"><%= category.description %></textarea>
                             <p id="descriptionError" class="text-danger"></p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="product_category" class="form-label">Discount</label>
+                            <input type="text" min="0" max="90" placeholder="Type here" value="<%= category.discount %>" class="form-control" name="discount" id="product_discount" />
+                            <p id="categoryError" class="text-danger"></p>
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Create category</button>

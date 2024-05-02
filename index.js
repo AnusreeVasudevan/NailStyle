@@ -4,15 +4,17 @@ const session = require("express-session");
 const noCache = require("nocache");
 const flash = require("connect-flash");
 const path = require("path");
+const morgan=require("morgan")
+require('dotenv').config();
 
 
-mongoose.connect("mongodb://127.0.0.1:27017/Nail_Style");
+mongoose.connect(process.env.mongo);
 
 const app = express();
 
 // Session middleware setup
 app.use(session({
-    secret: 'dfgHJkloPqrSvwXYZabcDEFgHJk', // Change this to a long random string
+    secret: 'dfgHJkloPqrSvwXYZabcDEFgHJk',
     resave: false,
     saveUninitialized: false
 }));
@@ -20,6 +22,7 @@ app.use(session({
 // Other middleware
 app.use(express.static('public'));
 app.use(noCache());
+//app.use(morgan("dev"))
 app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/admin", express.static(path.join(__dirname, "public")));

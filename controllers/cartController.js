@@ -349,12 +349,13 @@ const deleteCart = async (req, res) => {
 
 
 module.exports = {
+    loadAndShowCart,
     // loadCart,
     addTocart,
     // showCart,
     increaseQuantity,
     decreaseQuantity,
     deleteCart,
-    loadAndShowCart
+    
     
 }

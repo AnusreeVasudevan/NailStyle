@@ -5,12 +5,10 @@ const walletSchema=new mongoose.Schema({
         type:ObjectID,
         ref:'Users'
     },
-    credit:{
-        type:Boolean
-    },
     balance: Number,
     actions:[
         {
+            credit: Boolean,
             amount:Number,
             ref:String,
             order:{
@@ -25,5 +23,5 @@ const walletSchema=new mongoose.Schema({
 })
 
 
-const walletModel=mongoose.Schema('Wallet',walletSchema)
+const walletModel=mongoose.model('Wallet',walletSchema)
 module.exports=walletModel

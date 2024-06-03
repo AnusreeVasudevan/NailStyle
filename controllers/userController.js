@@ -9,6 +9,8 @@ const cartModel = require('../models/cartModel')
 const fs = require('fs');
 const handlebars = require('handlebars');
 const puppeteer = require('puppeteer');
+const walletModel = require('../models/walletModel')
+
 
 // Import necessary modules
 const {generateOTP} = require('../util/otpgenerator'); // Import OTP generator function
@@ -91,7 +93,6 @@ const getOtp = async(req,res)=>{
 
         if(otpInBody === otp){
             const {name,email,mobile,password} = req.session.Data
-
             console.log("username:",name);
             console.log("email:",email);
             console.log("mobile:",mobile); // Fix: Use `mobile` instead of `mobileno`
@@ -112,6 +113,13 @@ const getOtp = async(req,res)=>{
                 });
                 await user.save();//save to db
             }
+
+
+     
+        // Create a new wallet only if it doesn't exist
+        let wallet = new walletModel({ user: req.session.user, balance: 0, actions: [] });
+        await wallet.save();
+      
             return res.redirect('/login'); 
         }
         else{
@@ -214,39 +222,45 @@ let resendOtp = async (req, res) => {
 
 const loadShop = async(req, res) => {
     try {
-        let sortOption = {};
+    //     let sortOption = {};
 
-        switch(req.query.sort) {
-            case 'rating':
-                sortOption = { rating: -1 }; 
-                break;
-            case 'priceAsc':
-                sortOption = { discountPrice: 1 }; 
-                break;
-            case 'priceDesc':
-                sortOption = { discountPrice: -1 }; 
-                break;
-            case 'newness':
-                sortOption = { createdAt: -1 }; 
-                break;
-            case 'nameAsc':
-                sortOption = { name: 1 }; 
-                break;
-            case 'nameDesc':
-                sortOption = { name: -1 }; 
-                break;
+    //     switch(req.query.sort) {
+    //         case 'rating':
+    //             sortOption = { rating: -1 }; 
+    //             break;
+    //         case 'priceAsc':
+    //             sortOption = { discountPrice: 1 }; 
+    //             break;
+    //         case 'priceDesc':
+    //             sortOption = { discountPrice: -1 }; 
+    //             break;
+    //         case 'newness':
+    //             sortOption = { createdAt: -1 }; 
+    //             break;
+    //         case 'nameAsc':
+    //             sortOption = { name: 1 }; 
+    //             break;
+    //         case 'nameDesc':
+    //             sortOption = { name: -1 }; 
+    //             break;
             
-            default:
-                sortOption = { createdAt: -1 }; 
-                break;
-        }
+    //         default:
+    //             sortOption = { createdAt: -1 }; 
+    //             break;
+    //     }
 
-        const product = await ProductModel.find().sort(sortOption);
-        if(!product) {
-            product = null;
+    //     const product = await ProductModel.find().sort(sortOption);
+    //     if(!product) {
+    //         product = null;
+    //     }
+        // console.log(product, "pdt detailssssssssssssssssssss");
+        const category = await categoryModel.find({is_active:false});
+        if(req.session.search){
+            search = req.session.search;
+        }else{
+            search = ""
         }
-        console.log(product, "pdt detailssssssssssssssssssss");
-        res.render('shop', { product });
+        res.render('shop',{category,search});
     } catch(error) {
         console.log(error.message);
     }
@@ -379,7 +393,7 @@ const passwordReset = async (req, res) => {
 //     }
 //     catch(error){
 //       console.log('loaduserProfile',error.message);
-//     }
+//     }      
   
 //   };
 
@@ -389,12 +403,15 @@ const passwordReset = async (req, res) => {
 
 const loaduserprofile = async (req, res) => {
   try {
+    console.log(req.session.user)
       let address = await addressModel.findOne({ user: req.session.user }) || null;
-      const orders = await orderModel.find({ user: req.session.user }) || [];
+      const orders = await orderModel.find({ user: req.session.user }).sort({ orderDate: -1 }) || [];
       const user = await User.findById(req.session.user);
-
-      console.log( orders,'AAAAAAA');
-      res.render('userProfile', { user, address, orders });
+      let wallet = await walletModel.findOne({user:req.session.user})|| { balance: 0, transactions: [], actions:[] };
+        console.log(wallet,"mywallet")
+    
+    //   console.log( orders,'AAAAAAA');
+      res.render('userProfile', { user, address, orders, wallet });
   } catch (error) {
       console.log('loaduserProfile Error:', error.message);
   }
@@ -424,9 +441,10 @@ const loaduserprofile = async (req, res) => {
   
       // Check if the mobile already exists for another user
       const orders=await orderModel.findOne({user:req.session.user});
+      const wallet = await walletModel.findOne({user:req.session.user})
       const existingUserWithMobile = await User.findOne({ mobile: mobile });
       if (existingUserWithMobile && existingUserWithMobile.email!==user.email) {
-        return res.render('userProfile', { error: 'There is a user with this mobile number.', user,address,orders});
+        return res.render('userProfile', { error: 'There is a user with this mobile number.', user,address,orders,wallet});
         // return res.render('user-detail', { error: 'There is a user with this mobile number.', user,wish,cart });
       }
   
@@ -444,11 +462,11 @@ const loaduserprofile = async (req, res) => {
   
   
       if (updatedUser) {
-        return res.render('userProfile', { message: 'Updated successfully!', user: updatedUser,address,orders});
+        return res.render('userProfile', { message: 'Updated successfully!', user: updatedUser,address,orders,wallet});
         // return res.render('user-detail', { message: 'Updated successfully!', user: updatedUser ,wish,cart});
 
       } else {
-        return res.render('userProfile', { error: 'Failed to update user details.', user,address,orders});
+        return res.render('userProfile', { error: 'Failed to update user details.', user,address,orders,wallet});
         // return res.render('user-detail', { error: 'Failed to update user details.', user,wish,cart });
 
       }
@@ -771,6 +789,7 @@ const cancelorder = async (req, res) => {
       }
 
       const order = await orderModel.findOne({ oId });
+      console.log(order,"cancelled order")
 
       if (!order) {
           return res.status(404).json({ success: false, error: "Order not found" });
@@ -786,7 +805,14 @@ const cancelorder = async (req, res) => {
       order.requests.push(newCancelRequest);
       await order.save();
 
-      res.json({ success: true, message: "Order canceled successfully" });
+      let wallet = await walletModel.findOne({usre:req.session.user});
+      
+      const credit = order.billTotal;
+      wallet.balance = credit;
+      wallet.actions.push({amount : credit, ref:order.requests.reason, order:order._id, createdAt: new Date()})
+      await wallet.save();
+
+      res.json({ success: true, message: "Order canceled successfully and Amount refunded successfully" });
   } catch (error) {
       console.error("deleteOrder error:", error);
       return res.status(500).json({ success: false, error: "Internal server error" });
@@ -931,6 +957,58 @@ console.log(orders,'1111111111111');
     }
 }
 
+
+const loadMyProducts = async (req,res)=>{
+    try{
+        let sortOption = {};
+
+        switch(req.query.sort) {
+            case 'rating':
+                sortOption = { rating: -1 }; 
+                break;
+            case 'priceAsc':
+                sortOption = { discountPrice: 1 }; 
+                break;
+            case 'priceDesc':
+                sortOption = { discountPrice: -1 }; 
+                break;
+            case 'newness':
+                sortOption = { createdAt: -1 }; 
+                break;
+            case 'nameAsc':
+                sortOption = { name: 1 }; 
+                break;
+            case 'nameDesc':
+                sortOption = { name: -1 }; 
+                break;
+            
+            default:
+                sortOption = { createdAt: -1 }; 
+                break;
+        }
+         let {category,minamount,maxamount,sort,stock,search,page} = req.body.obj
+         console.log(category,minamount,maxamount,sort,stock,search,page,"MyData")
+         if(search)
+            req.session.search = search;
+
+            
+            if(stock){
+                stock = 1;
+            }else{
+                stock = 0;
+            }
+            let limit = 3
+            const product = await ProductModel.find({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount},countInStock:{$gte:stock},name: { $regex: new RegExp(search,"i") },description: {$regex: new RegExp(search,"i")}}).skip((page-1)*3).limit(limit).sort(sortOption);
+            const pro = await ProductModel.countDocuments({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount},countInStock:{$gte:stock},name: { $regex: new RegExp(search,"i") },description: {$regex: new RegExp(search,"i")}});
+            // const product = await ProductModel.countDocuments({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount}}).sort(sortOption);
+        //  console.log(category,"mycategory")
+         console.log(product,"MyProducts")
+         res.status(200).json({message:"success",product,limit,pro})
+    }catch(error){
+
+    }
+}
+
 module.exports = {
     loginLoad,
     loadRegister,
@@ -955,6 +1033,7 @@ module.exports = {
     deleteAddress,
     cancelorder,
     returnOrder,
-    downloadInvoice
+    downloadInvoice,
+    loadMyProducts
     
 }

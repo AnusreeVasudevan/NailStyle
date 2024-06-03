@@ -657,7 +657,7 @@
                             <div class="swiper-wrapper">
                                 <% for( let i = 0; i < 4; i++ ) { %>
                                 <div class="product-image-large-image swiper-slide zoom-image-hover img-responsive">
-                                    <img src="/uploads/productImages/<%= product.images[i]%>" alt="">
+                                    <img src="/uploads/productImages/<%=product.images[i]%>" alt="">
                                 </div>
                                 <% } %>
                             </div>
@@ -669,7 +669,7 @@
                             <div class="swiper-wrapper">
                                 <% for( let i = 0; i < 4; i++ ) { %>
                                 <div class="product-image-thumb-single swiper-slide">
-                                    <img class="img-fluid" src="/uploads/productImages/<%= product.images[i]%>"
+                                    <img class="img-fluid" src="/uploads/productImages/<%=product.images[i]%>"
                                         alt="">
                                 </div>
                                 <% } %>
@@ -1037,9 +1037,9 @@
                                     <% relatedProducts.forEach(relatedProduct => { %>
                                     <div class="product-default-single-item product-color--golden swiper-slide">
                                         <div class="image-box">
-                                            <a href="/productDetails?id=<%= relatedProduct._id %>">
+                                            <a href="/productDetails?id=<%=relatedProduct._id%>">
                                                 <% if (relatedProduct.images && relatedProduct.images.length > 0) { %>
-                                                    <img src="/uploads/productImages/<%= relatedProduct.images[0] %>" style="width:300px" alt="<%= relatedProduct.name %>">
+                                                    <img src="/uploads/productImages/<%=relatedProduct.images[0]%>" style="width:300px" alt="<%= relatedProduct.name %>">
                                                 <% } else { %>
                                                     <img src="/path/to/placeholder-image.jpg" alt="Placeholder Image">
                                                 <% } %>

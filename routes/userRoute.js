@@ -17,6 +17,8 @@ const cartController = require('../controllers/cartController');
 const checkoutController = require('../controllers/checkoutController');
 const wishlistController = require('../controllers/wishlistController');
 const couponController = require('../controllers/couponController');
+const walletController = require('../controllers/walletController');
+
 
 user_route.get('/',auth.isLogout,userController.loginLoad);
 user_route.get('/login',auth.isLogout,userController.loginLoad);
@@ -39,7 +41,7 @@ user_route.post('/userprofile',userController.editprofile)
 user_route.get('/addaddress',auth.isLogin,userController.loadaddaddress);
 user_route.post('/addaddress',userController.addAddress);
 user_route.get('/editaddress',auth.isLogin,userController.loadeditAddress);
-user_route.post('/editaddress',userController.editAddress)
+user_route.post('/editaddress',userController.editAddress);
 user_route.get('/deleteaddress',auth.isLogin,userController.deleteAddress);
 user_route.get('/cart',auth.isLogin,cartController.loadAndShowCart);
 user_route.post('/add-to-cart',cartController.addTocart);
@@ -62,9 +64,11 @@ user_route.post('/orderonlineload',checkoutController.orderonlineload);
 user_route.post('/razorpay',checkoutController.razorpayFn);
 user_route.get('/payment',checkoutController.payment);
 user_route.post('/cashondelivery',checkoutController.codFn);
+user_route.post('/wallet',checkoutController.wallet);
 user_route.post('/downloadinvoice/:oId',userController.downloadInvoice);
 user_route.post('/retrypayment',checkoutController.revisePayment);
-
+user_route.post('/myShop',userController.loadMyProducts);
+// user_route.get('/mywallet',walletController.wallet);
 
 module.exports = user_route;
 

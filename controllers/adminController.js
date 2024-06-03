@@ -8,6 +8,7 @@ const fs = require('fs');
 // const securePassword = require('secure-password');
 const puppeteer = require('puppeteer');
 const handlebars = require('handlebars');
+const walletModel = require("../models/walletModel");
 
 const loadLogin = async(req,res)=>{
     try{
@@ -328,8 +329,8 @@ const requestAccept = async (req, res) => {
     // Iterate over each item in the canceled order to update product stock.
     for (const orderItem of canceledOrder.items) {
       let product = await productModel.findById(orderItem.productId).exec();
-      console.log('comeeeeeeeeeeeeee',orderItem.productId,orderItem.quantity);
-      console.log(product,'come2');
+      console.log('Product ID:', orderItem.productId, 'Quantity:', orderItem.quantity);
+      console.log('Product:', product);
       if (product) {
         product.countInStock += Number(orderItem.quantity);
         await product.save();
@@ -350,15 +351,35 @@ const requestAccept = async (req, res) => {
           },
           { new: true }
         );
+
+        if (request.type === 'Cancel') {
+          let wallet = await walletModel.findOne({ user: userId });
+          if (!wallet) {
+            // If no wallet exists for the user, create a new one
+            wallet = new walletModel({ user: userId, balance: 0, actions: [] });
+          }
+          console.log("haiii",canceledOrder,"cancel order......")
+          const credit = canceledOrder.billTotal;
+          wallet.balance += credit; // Add the credit to the wallet's balance
+          wallet.actions.push({
+            amount: credit,
+            ref: canceledOrder.requests.reason,
+            order: canceledOrder._id,
+            createdAt: new Date()
+          });
+          console.log(wallet,"wallettttt")
+          await wallet.save();
+        }
       }
     }
 
-    return res.status(200).json({ success: true, message: 'Order status updated successfully' });
+    return res.status(200).json({ success: true, message: 'Order status updated successfully and amount credited to wallet' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
 
 
 const requestCancel = async(req,res)=>{
@@ -574,6 +595,86 @@ const filterProducts = async (req, res) => {
   }
 };
 
+const loadCharts = async(req,res)=>{
+  try{
+    res.render('dashboard')
+  }catch(error){
+    console.log(error.message)
+  }
+}
+
+const monthlyData = async(req,res)=>{
+  try{
+    const months = new Date();
+    months.setMonth(months.getMonth() - 12);
+
+    const orders = await orderModel.aggregate([
+      {
+        $match:{
+          createdAt: {$gte: months}
+        }
+      },
+      {
+        $group:{
+          _id: {$dateToString: {format: "%m-%Y" , date:"$createdAt"} },
+          totalAmount: {$sum: "$billTotal"}
+        }
+      },
+      {
+        $sort: {"_id":1}
+      }
+    ]);
+
+    const sorted = orders.map(order => ({
+      ...order,
+      _id: new Date(order._id.split('-').reverse().join('-') + '-01T00:00:00')
+    })).sort((a,b)=>a._id - b._id);
+
+    const yValues = sorted.map(order => order.totalAmount);
+    const xValues = sorted.map(order => order._id.toLocaleDateString('en-GB',{month: 'long' , year:'numeric'}));
+    return res.status(200).json({yValues , xValues})
+
+  }catch(error){
+    console.log(error.message)
+  }
+}
+
+
+const dailyData = async(req,res)=>{
+  try{
+    const days = new Date();
+    days.setDate(days.getDate() - 30);
+
+    const orders = await orderModel.aggregate([
+      {
+        $match:{
+          createdAt: {$gte: days}
+        }
+      },
+      {
+        $group:{
+          _id: {$dateToString: {format: "%d-%m-%Y" , date:"$createdAt"} },
+          totalAmount: {$sum: "$billTotal"}
+        }
+      },
+      {
+        $sort: {"_id":1}
+      }
+    ]);
+
+    const sorted = orders.map(order => ({
+      ...order,
+      _id: new Date(order._id.split('-').reverse().join('-') + '-01T00:00:00')
+    })).sort((a,b)=>a._id - b._id);
+
+    const yValues = sorted.map(order => order.totalAmount);
+    const xValues = sorted.map(order => order._id.toLocaleDateString('en-GB'));
+    return res.status(200).json({yValues , xValues})
+
+  }catch(error){
+    console.log(error.message)
+  }
+}
 
 module.exports = {
     loadLogin,
@@ -590,5 +691,8 @@ module.exports = {
     requestCancel,
     updateorder,
     createReport,
-    filterProducts
+    filterProducts,
+    loadCharts,
+    monthlyData,
+    dailyData
 }

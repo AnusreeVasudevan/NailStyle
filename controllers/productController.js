@@ -9,7 +9,7 @@ const loadProduct = async (req, res) => {
         const productdetails = await productModel.find().populate('category');
         const categorydetails = await categoryModel.find();
         console.log(productdetails,"detailspdt");
-        res.render('addProduct', { product: productdetails, category: categorydetails, message: null });
+        res.render('listProduct', { product: productdetails, category: categorydetails, message: null });
     } catch (error) {
         console.log(error.message)
     }
@@ -17,10 +17,11 @@ const loadProduct = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
+        console.log("keri")
         // Prepare images array from uploaded files
         const images = req.files ? req.files.map(file => file.filename) : [];
 
-        console.log(images);
+        console.log(req.body);
 
         // Create a new product instance
         const product = new productModel({
@@ -142,16 +143,23 @@ const editProduct = async (req, res) => {
 
 
 const loadIndividualProduct = async (req, res) => {
+    console.log("entered")
     try {
+        // id='6630db4d994dff25ab730c82'
         const id = req.query.id;
-        const userId = req.session.user; // Or however you access the logged-in user's ID
-        const productData = await productModel.findById(id).populate('category');
+ 
+        const userId = req.session.user; 
+        console.log(id,"myproductsid")
+        let productData = await productModel.find({_id:id}).populate('category')
+        productData=productData[0]
+        console.log(productData,"aaaaaaaa")
         const relatedProducts = await productModel.find({ category: productData.category }).limit(5);
-        
+
         // Assuming you have correctly imported isProductInWishlist function
         const isInWishlist = await isProductInWishlist(userId, id);
-
+        console.log("bbbbb")
         if (productData) {
+            console.log(productData.name)
             res.render('productDetails', {
                 product: productData,
                 category: productData.category.name,
@@ -200,6 +208,14 @@ async function isProductInWishlist(userId, productId) {
     return wishlist.product.some(product => product.toString() === productId);
 }
 
+const loadaddproduct = async(req,res)=>{
+    try{
+        const category = await categoryModel.find();
+        res.render('addproduct',{category})
+    }catch(error){
+        console.log(error.message)
+    }
+}
 
 
  
@@ -210,6 +226,7 @@ module.exports = {
     loadEdit,
     editProduct,
     loadIndividualProduct,
-    isProductInWishlist
+    isProductInWishlist,
+    loadaddproduct
 
 }

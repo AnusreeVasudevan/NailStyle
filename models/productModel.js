@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0,
-    max: 100,
+    // max: 100,
   },
   rating: {
     type: Number,
@@ -44,7 +44,12 @@ const productSchema = new mongoose.Schema({
   is_deleted: {
     type: Boolean,
     default: false, 
-  }
+  },
+    popularity: {
+      type:Number,
+      default: 0
+    }
+  
 }, {
   timestamps: true
 });

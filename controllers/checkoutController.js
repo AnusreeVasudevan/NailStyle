@@ -6,6 +6,7 @@ const orderModel = require("../models/orderModel")
 const randomstring = require("randomstring");
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const walletModel = require("../models/walletModel");
 
 
 const loadcheckout = async (req, res) => {
@@ -13,9 +14,6 @@ const loadcheckout = async (req, res) => {
         let address = await addressModel.findOne({
             user: req.session.user
         }) || null;
-        // const order=await orderModel.findOne({
-        //   user: req.session.user
-        // }) || null;
         const cart = await cartModel.findOne({
             owner: req.session.user
         }).populate({ path: 'items.productId', model: 'Products' }) || null;
@@ -23,7 +21,13 @@ const loadcheckout = async (req, res) => {
         req.session.cart=cart._id
         console.log("caart id "+req.session.cart)
         const user = await User.findById(req.session.user);
-        res.render('checkout', { user, address, cart });
+        
+        if(cart.items.length !== 0){
+            res.render('checkout', { user, address, cart });
+        }else{
+            res.redirect('/shop')
+        }
+        
     }
     catch (error) {
         console.log('loadcheckout', error.message);
@@ -105,6 +109,7 @@ const razorpayFn=async (req,res)=>{
             for (const item of cart.items) {
                 const product = await productModel.findOne({ _id: item.productId });
                 product.countInStock -= item.quantity;
+                product.popularity += item.quantity;
                 await product.save();
             }
 
@@ -308,6 +313,7 @@ const codFn = async (req, res) => {
     for (const item of cart.items) {
         const product = await productModel.findOne({ _id: item.productId });
         product.countInStock -= item.quantity;
+        product.popularity += item.quantity;
         await product.save();
     }
 
@@ -717,6 +723,83 @@ const revisePayment = async(req,res)=>{
     }
 }
 
+
+const wallet = async (req, res) => {
+    const { a_id, pay } = req.body.data;
+    const { user, c_id } = req.session;
+    const wallet=await walletModel.findOne({user:user})
+    const cart = await cartModel.findOne(c_id).populate('items.productId');
+
+    
+
+    const address = await addressModel.findOne({
+        user: user,
+        'addresses._id': a_id
+    }, {
+        'addresses.$': 1 // Use the positional $ operator to fetch only the matching address
+    });
+
+    const order_id = await generateUniqueOrderID();
+
+    const url = `orderconfirmed?id=${order_id}`;
+
+    const orderData = new orderModel({
+        user: user,
+        oId: order_id,
+        deliveryAddress: address.addresses[0],
+        paymentMethod: pay,
+        coupon: cart.coupon,
+        discountPrice: cart.discountPrice,
+        cart: cart._id,
+        billTotal: cart.billTotal,
+        oId: order_id,
+    });
+    for (const item of cart.items) {
+        orderData.items.push({
+            productId: item.productId._id,
+            image: item.productId.images[0],
+            name: item.productId.name,
+            productPrice: item.productId.price,
+            quantity: item.quantity,
+            price: item.price
+        })
+    }
+
+    await orderData.save();
+        wallet.balance-=cart.billTotal
+        wallet.actions.push({
+            credit: false,
+            amount: cart.billTotal,
+            order: orderData._id
+    })
+
+
+
+        // Check if the total bill is above Rs 1000 and if payment method is COD
+        // if (cart.billTotal > 1000) {
+        //     return res.status(400).json({
+        //         message: "COD is not available for orders above Rs 1000."
+        //     });
+        // }
+    await wallet.save()
+
+    req.session.orderId = orderData._id;
+    // Update stock levels
+    for (const item of cart.items) {
+        const product = await productModel.findOne({ _id: item.productId });
+        product.countInStock -= item.quantity;
+        product.popularity += item.quantity;
+        await product.save();
+    }
+
+    // Clear the cart
+    cart.items = [];
+    await cart.save();
+
+    res.json({ url });
+};
+
+
 module.exports = {
     loadcheckout,
     Postcheckout,
@@ -727,5 +810,6 @@ module.exports = {
     razorpayFn,
     payment,
     codFn,
-    revisePayment
+    revisePayment,
+    wallet
 }

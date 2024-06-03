@@ -838,7 +838,7 @@
                             <h4>My Wallet</h4>
                             <div class="card-body">
                                 <h5>Wallet Balance:</h5>
-                                <h5 class="lead">INR 5000</h5>
+                                <h5 class="lead"><%= wallet ? wallet.balance : 0 %></h5>
                                 <div class="wallet-transactions" style="max-height: 200px; overflow-y: auto;">
                                     <h5>Recent Transactions:</h5>
                                     <table class="table">
@@ -852,32 +852,29 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="text-success">Credit</td>
-                                                <td>April 10, 2024</td>
-                                                <td>10:30 AM</td>
-                                                <td>+INR 1000</td>
-                                                <td>Deposit</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-danger">Debit</td>
-                                                <td>April 9, 2024</td>
-                                                <td>3:45 PM</td>
-                                                <td>-INR 500</td>
-                                                <td>Withdrawal</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-success">Credit</td>
-                                                <td>April 8, 2024</td>
-                                                <td>12:15 PM</td>
-                                                <td>+INR 2000</td>
-                                                <td>Refund</td>
-                                            </tr>
+                                            <% if (wallet && wallet.actions && wallet.actions.length > 0) { %>
+                                                <% wallet.actions.forEach(action => { %>
+                                                  <tr>
+                                                    <td class="<%= action.amount > 0 ? 'text-success' : 'text-danger' %>">
+                                                      <%= action.credit ==false ? 'Debit' : 'Credit' %>
+                                                    </td>
+                                                    <td><%= new Date(action.createdAt).toLocaleDateString() %></td>
+                                                    <td><%= new Date(action.createdAt).toLocaleTimeString() %></td>
+                                                    <td><%= action.amount > 0 ? `+INR ${action.amount}` : `-INR ${Math.abs(action.amount)}` %></td>
+                                                    <td><%= action.ref %></td>
+                                                  </tr>
+                                                <% }) %>
+                                              <% } else { %>
+                                                <tr>
+                                                  <td colspan="5">No transactions found.</td>
+                                                </tr>
+                                              <% } %>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
+                        
                         
                         <div class="tab-pane" id="address">
                             <!-- <p>The following addresses will be used on the checkout page .</p> -->
@@ -1300,7 +1297,7 @@
 
     <!-- Main JS -->
     <script src="assets/js/main.js"></script>
-    <script>
+    <!-- <script>
         function removeMessages() {
             const errorMessages = document.querySelectorAll('.text-danger');
             const successMessages = document.querySelectorAll('.text-success');
@@ -1321,7 +1318,7 @@
         window.onload = function() {
             removeMessages();
         };
-    </script>
+    </script> -->
     <script>
         // Function to validate the form
         function validateForm() {

@@ -811,6 +811,12 @@
                                         <span>Razor Pay</span>
                                     </label>
                                 </div>
+                                <div><label class="checkbox-default" for="currencyPaypal" data-bs-toggle="collapse"
+                                    data-bs-target="#methodPaypal">
+                                    <input type="radio" id="wallet" value="wallet" name="paymentOption">
+                                    <span>Wallet</span>
+                                </label>
+                            </div>
                             </div>
 
                             <div class="order_button pt-3">
@@ -1262,6 +1268,25 @@
         };
         var rzp1 = new Razorpay(options);
         rzp1.open();
+    } else if(paymentOption== "wallet") {
+        const res = await fetch('/wallet', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ data })
+        });
+        if (res.ok) {
+            const data = await res.json()
+            window.location.href = data.url
+        } else {
+            const errorData = await res.json();
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: errorData.message,
+            });
+        }
     } else {
         const res = await fetch('/cashondelivery', {
             method: 'post',

@@ -34,6 +34,20 @@
     <link rel="stylesheet" href="assets/css/vendor/vendor.min.css">
     <link rel="stylesheet" href="assets/css/plugins/plugins.min.css">
     <link rel="stylesheet" href="assets/css/style.min.css">
+    <style>
+        .password-container {
+            position: relative;
+            width: fit-content;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+    </style>
 
 </head>
 
@@ -57,9 +71,9 @@
                             <div class="main-menu menu-color--black menu-hover-color--golden">
                                 <nav>
                                     <ul>
-                                        <li class="has-dropdown">
+                                        <!-- <li class="has-dropdown">
                                             <a class="active main-menu-link">Home <i
-                                                    class="fa fa-angle-down"></i></a>
+                                                    class="fa fa-angle-down"></i></a> -->
                                             <!-- Sub Menu -->
                                             <!-- <ul class="sub-menu">
                                                 <li><a href="index.html">Home 1</a></li>
@@ -67,10 +81,10 @@
                                                 <li><a href="index-3.html">Home 3</a></li>
                                                 <li><a href="index-4.html">Home 4</a></li>
                                             </ul> -->
-                                        </li>
-                                        <li class="has-dropdown has-megaitem">
+                                        <!-- </li> -->
+                                        <!-- <li class="has-dropdown has-megaitem">
                                             <a href="">Shop <i
-                                                    class="fa fa-angle-down"></i></a>
+                                                    class="fa fa-angle-down"></i></a> -->
                                             <!-- Mega Menu -->
                                             <!-- <div class="mega-menu">
                                                 <ul class="mega-menu-inner"> -->
@@ -144,10 +158,10 @@
                                                     </a>
                                                 </div>
                                             </div> -->
-                                        </li>
+                                        <!-- </li>
                                         <li class="has-dropdown">
                                             <a href="">Blog <i
-                                                    class="fa fa-angle-down"></i></a>
+                                                    class="fa fa-angle-down"></i></a> -->
                                             <!-- Sub Menu -->
                                             <!-- <ul class="sub-menu">
                                                 <li><a href="blog-grid-sidebar-left.html">Blog Grid Sidebar left</a>
@@ -164,16 +178,16 @@
                                                 <li><a href="blog-single-sidebar-right.html">Blog Single Sidebar
                                                         Right</a></li>
                                             </ul> -->
-                                        </li>
+                                        <!-- </li>
                                         <li class="has-dropdown">
-                                            <a href="">Pages <i class="fa fa-angle-down"></i></a>
+                                            <a href="">Pages <i class="fa fa-angle-down"></i></a> -->
                                             <!-- Sub Menu -->
                                             <!-- <ul class="sub-menu">
                                                 <li><a href="faq.html">Frequently Questions</a></li>
                                                 <li><a href="privacy-policy.html">Privacy Policy</a></li>
                                                 <li><a href="404.html">404 Page</a></li>
                                             </ul> -->
-                                        </li>
+                                        <!-- </li> -->
                                         <!-- <li>
                                             <a href="">Logout</a>
                                         </li> -->
@@ -240,7 +254,7 @@
 
                     <!-- Start Mobile Right Side -->
                     <div class="mobile-right-side">
-                        <ul class="header-action-link action-color--black action-hover-color--golden">
+                        <!-- <ul class="header-action-link action-color--black action-hover-color--golden">
                             <li>
                                 <a href="#search">
                                     <i class="icon-magnifier"></i>
@@ -263,7 +277,7 @@
                                     <i class="icon-menu"></i>
                                 </a>
                             </li>
-                        </ul>
+                        </ul> -->
                     </div>
                     <!-- End Mobile Right Side -->
                 </div>
@@ -663,9 +677,11 @@
                             </div>
                             <div class="default-form-box">
                                 <label>Passwords <span>*</span></label>
-                                <input type="password" name="password" id="password" value="Janki@123" style="border-style: solid; border-color: rgb(41, 37, 37); border-width: 1px;">
+                                <div class="password-container">
+                                    <input type="password" name="password" id="password" value="Janki@123" style="border-style: solid; border-color: rgb(41, 37, 37); border-width: 1px;">
+                                    <span id="togglePassword" class="password-toggle">👁️</span>
+                                </div>
                                 <p id="passwordError" class="text-danger"></p>
-                                <!-- Forgot Password Link -->
                                 <a href="/emailforgotpassword" style="display: block; margin-top: 10px;">Forgot Password?</a>
                             </div>
                             <div class="login_submit">
@@ -1127,6 +1143,15 @@ formFields.forEach(field => {
         errorElement.textContent = '';
     });
 });
+</script>
+
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function (e) {
+        const passwordField = document.getElementById('password');
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+    });
 </script>
 </body>
 </html>

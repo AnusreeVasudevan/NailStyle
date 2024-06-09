@@ -1,3 +1,5 @@
+const userModel = require("../models/userModel")
+
 const isLogin = async(req,res,next)=>{
     // req.session.user='65d599545a78f982240d2a0f'
     try{
@@ -37,8 +39,31 @@ const checkAuth = (req, res, next) => {
     }
 };
 
+const ifBlocked = async (req, res, next) => {
+    try {
+        const user = await userModel.findById(req.session.user);
+        
+        if (user.is_blocked === true) {
+            req.session.destroy((err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send('Internal Server Error');
+                }
+                res.redirect('/login');
+            });
+        } else {
+            return next();
+        }
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).send('Internal Server Error');
+    }
+};
+
+
 module.exports = {
     isLogin,
     isLogout,
-    checkAuth
-}
+    checkAuth,
+    ifBlocked
+};

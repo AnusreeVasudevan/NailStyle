@@ -75,7 +75,7 @@
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
-                <form class="searchform">
+                <!-- <form class="searchform">
                     <div class="input-group">
                         <input list="search_terms" type="text" class="form-control" placeholder="Search term">
                         <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
@@ -86,7 +86,7 @@
                         <option value="Apple iphone">
                         <option value="Ahmed Hassan">
                     </datalist>
-                </form>
+                </form> -->
             </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
@@ -133,11 +133,11 @@
                     <h2 class="content-title card-title">Dashboard </h2>
                     <p>Whole data about your business here</p>
                 </div>
-                <div>
+                <!-- <div>
                     <a href="#" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
-                </div>
+                </div> -->
             </div>
-            <div class="row">
+            <!-- <div class="row">
                 <div class="col-lg-3">
                     <div class="card card-body mb-4">
                         <article class="icontext">
@@ -191,20 +191,22 @@
                         </article>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="row">
                 <div class="col-xl-8 col-lg-12">
                     <div class="card mb-4">
-                        <article class="card-body">
-                            <h5 class="card-title">Sale statistics</h5>
-                            <select name="" id="selection">
-                                <option value="Daily">Daily</option>
-                                <option value="Monthly">Monthly</option>
-                            </select>
-                            <canvas id="myChart" height="120px"></canvas>
-                        </article>
+                        <div class="card mb-4">
+                            <article class="card-body">
+                                <h5 class="card-title">Sales statistics</h5>
+                                <select name="" id="selection">
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Daily">Daily</option>
+                                </select>
+                                <canvas id="myChart" height="120px"></canvas>
+                            </article>
+                        </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-lg-5">
                             <div class="card mb-4">
                                 <article class="card-body">
@@ -334,75 +336,41 @@
                                 </article>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="col-xl-4 col-lg-12">
                     <div class="card mb-4">
                         <article class="card-body">
-                            <h5 class="card-title">Revenue Base on Area</h5>
-                            <canvas id="myChart2" height="217"></canvas>
+                            <h5 class="card-title">Top Selling Categories</h5>
+                            <div id="categoryList">
+                                
+                            </div>
                         </article>
                     </div>
                     <div class="card mb-4">
                         <article class="card-body">
-                            <h5 class="card-title">Marketing Chanel</h5>
-                            <span class="text-muted font-xs">Facebook</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 15%">15%</div>
-                            </div>
-                            <span class="text-muted font-xs">Instagram</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 65%">65% </div>
-                            </div>
-                            <span class="text-muted font-xs">Google</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 51%"> 51% </div>
-                            </div>
-                            <span class="text-muted font-xs">Twitter</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 80%"> 80%</div>
-                            </div>
-                            <span class="text-muted font-xs">Other</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 80%"> 80%</div>
+                            <h5 class="card-title">Top Selling Products</h5>
+                            <div id="productList">
+                                <!-- Progress bars will be injected here by the script -->
                             </div>
                         </article>
                     </div>
                 </div>
             </div>
-            <div class="card mb-4">
+            <!-- <div class="card mb-4">
                 <header class="card-header">
                     <h4 class="card-title">Latest orders</h4>
                     <div class="row align-items-center">
                         <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                            <div class="custom_select">
-                                <select class="form-select select-nice">
-                                    <option selected>All Categories</option>
-                                    <option>Women's Clothing</option>
-                                    <option>Men's Clothing</option>
-                                    <option>Cellphones</option>
-                                    <option>Computer & Office</option>
-                                    <option>Consumer Electronics</option>
-                                    <option>Jewelry & Accessories</option>
-                                    <option>Home & Garden</option>
-                                    <option>Luggage & Bags</option>
-                                    <option>Shoes</option>
-                                    <option>Mother & Kids</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <input type="date" value="02.05.2021" class="form-control">
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <div class="custom_select">
-                                <select class="form-select select-nice">
-                                    <option selected>Status</option>
-                                    <option>All</option>
-                                    <option>Paid</option>
-                                    <option>Chargeback</option>
-                                    <option>Refund</option>
-                                </select>
+                            <div class="input-group">
+                                <select class="form-control" style="max-width: 150px;">
+                            <option value="all">All</option>
+                            <option value="product">Product</option>
+                            <option value="category">Category</option>
+                        </select>
+                                <button class="btn btn-light bg" type="button"> 
+                                    <i class="material-icons md-search"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -582,9 +550,9 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div> <!-- table-responsive end// -->
+                    </div> 
                 </div>
-            </div>
+            </div> -->
             <!-- <div class="pagination-area mt-30 mb-50">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-start">
@@ -623,8 +591,101 @@
     <script src="adminassets/js/main.js" type="text/javascript"></script>
     <script src="adminassets/js/custom-chart.js" type="text/javascript"></script>
 
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const productList = document.getElementById('productList');
+
+    async function fetchTopProducts() {
+        try {
+            const response = await fetch('/admin/topproducts');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const products = await response.json();
+            renderProgressBars(products);
+        } catch (err) {
+            console.error('Error fetching top products:', err);
+        }
+    }
+
+    function renderProgressBars(products) {
+        productList.innerHTML = '';
+
+        products.forEach(product => {
+            const progressPercentage = (product.popularity / products[0].popularity) * 100;
+
+            const productElement = document.createElement('div');
+            productElement.innerHTML = `
+                <span class="text-muted font-xs">${product.name}</span>
+                <div class="progress mb-3">
+                    <div class="progress-bar" role="progressbar" style="width: ${progressPercentage}%" aria-valuenow="${progressPercentage}" aria-valuemin="0" aria-valuemax="100">
+                        ${progressPercentage.toFixed(2)}%
+                    </div>
+                </div>
+            `;
+            productList.appendChild(productElement);
+        });
+    }
+
+    await fetchTopProducts();
+});
 
 
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const categoryList = document.getElementById('categoryList');
+
+    async function fetchTopCategories() {
+        try {
+            const response = await fetch('/admin/topcategory');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const categories = await response.json();
+            console.log(categories); // Log the response for debugging
+            renderProgressBars(categories);
+        } catch (err) {
+            console.error('Error fetching top categories:', err);
+        }
+    }
+
+    function renderProgressBars(categories) {
+        categoryList.innerHTML = '';
+
+        if (categories.length === 0) {
+            categoryList.innerHTML = '<p>No categories available.</p>';
+            return;
+        }
+
+        const maxPopularity = categories[0].totalPopularity;
+
+        categories.forEach(category => {
+            const progressPercentage = (category.totalPopularity / maxPopularity) * 100;
+
+            const categoryElement = document.createElement('div');
+            categoryElement.innerHTML = `
+                <span class="text-muted font-xs">${category.categoryDetails.name}</span>
+                <div class="progress mb-3">
+                    <div class="progress-bar" role="progressbar" style="width: ${progressPercentage}%" aria-valuenow="${progressPercentage}" aria-valuemin="0" aria-valuemax="100">
+                        ${progressPercentage.toFixed(2)}%
+                    </div>
+                </div>
+            `;
+            categoryList.appendChild(categoryElement);
+        });
+    }
+
+    // Fetch and display top categories when the page loads
+    await fetchTopCategories();
+});
+
+
+
+
+</script>
 
 </body>
 

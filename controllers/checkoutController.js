@@ -7,23 +7,23 @@ const randomstring = require("randomstring");
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const walletModel = require("../models/walletModel");
+const categoryModel = require("../models/categoryModel");
 
 
 const loadcheckout = async (req, res) => {
     try {
+        let wallet = await walletModel.findOne({user:req.session.user})
         let address = await addressModel.findOne({
             user: req.session.user
         }) || null;
         const cart = await cartModel.findOne({
             owner: req.session.user
         }).populate({ path: 'items.productId', model: 'Products' }) || null;
-        console.log("cart"+cart);
         req.session.cart=cart._id
-        console.log("caart id "+req.session.cart)
         const user = await User.findById(req.session.user);
-        
+        console.log(user, address, cart);
         if(cart.items.length !== 0){
-            res.render('checkout', { user, address, cart });
+            res.render('checkout', { user, address, cart, wallet });
         }else{
             res.redirect('/shop')
         }
@@ -342,122 +342,6 @@ async function generateUniqueOrderID() {
     return orderID;
 }
 
-//   const loadorderconfirmed = async(req,res)=>{
-//     try{
-//         const id=req.query.id;
-//         const order=await orderModel.findOne({oId:id})
-//         res.render('orderconfirmed',{order});
-//     }catch(error){
-//         console.log(error.message);
-//     }
-// }
-
-// const loadorderconfirmed = async (req, res) => {
-//     const orderId = req.query.id; // Retrieve the order ID from the query string
-//     try {
-//         const order = await orderModel.findOne({ oId: orderId });
-//         console.log(order);
-//         if (!order) {
-//             // Handle the case where an order is not found
-//             return res.status(404);
-//         }
-//         // If the order is found, render the order confirmed page with the order details
-//         res.render('orderconfirmed', { order: order }); // Ensure you have an 'orderConfirmed.ejs' view in your views directory
-//     } catch (error) {
-//         console.error("Error retrieving order:", error);
-//         // Handle any other errors, such as database connection issues
-//         res.status(500).render('errorPage', { message: "An error occurred while retrieving the order." });
-//     }
-// };
-
-// const Postcheckout = async (req, res) => {
-//     try {
-//         const paymentOption = req.body.paymentOption;
-//         const address = req.body.addressType ;
-//         if (!paymentOption) {
-//             return res.status(400);
-//         }
-//         if (!address) {
-//             return res.status(400);
-//         }
-
-//         const user = await User.findById(req.session.user);
-//         const cart = await cartModel.findOne({ owner: user._id }).populate({ path: 'items.productId', model: 'Products' });
-//         if (!cart) {
-//             return res.status(400).json({ message: "Cart not found" });
-//         }
-
-//         const OrderAddress = await addressModel.findOne({ user: user._id });
-//         if (!OrderAddress) {
-//             return res.status(400).json({ message: "Address not found" });
-//         }
-
-//         const addressdetails = OrderAddress.addresses.find(
-//             (item) => item.addressType === address
-//         );
-//         if (!addressdetails) {
-//             return res.status(400).json({ message: "Invalid address ID" });
-//         }
-
-//         const selectedItems = cart.items;
-
-//         for (const item of selectedItems) {
-//             const product = await productModel.findOne({ _id: item.productId });
-
-//             if (product.countInStock === 0) {
-//                 return res.status(400).json({ message: "product Out of stock" });
-//             }
-//             if (product) {
-//                 if (product.countInStock >= item.quantity) {
-//                     product.countInStock -= item.quantity;
-//                     // product.popularity++;
-
-//                     await product.save();
-//                 }
-//             } else {
-//                 console.log('Product not found');
-//             }
-//         }
-
-//         const order_id = await generateUniqueOrderID();
-
-//         const orderData = new orderModel({
-//             user: user._id,
-//             cart: cart._id,
-//             billTotal: cart.billTotal,
-//             oId: order_id,
-//             paymentStatus: "Success",
-//             paymentMethod: paymentOption,
-//             deliveryAddress: addressdetails,
-//             coupon: cart.coupon,
-//             discountPrice: cart.discountPrice
-//         });
-
-//         for (const item of selectedItems) {
-//             orderData.items.push({
-//                 productId: item.productId._id,
-//                 image: item.productId.images[0],
-//                 name: item.productId.name,
-//                 productPrice: item.productId.price,
-//                 quantity: item.quantity,
-//                 price: item.price
-//             })
-//         }
-
-//         await orderData.save();
-
-//         cart.items = [];
-//         cart.isApplied = false;
-//         await cart.save();
-
-//         res.status(200).json({order_id});
-
-//     } catch (error) {
-//         console.log('Post checkout error:', error.message);
-//         res.status(500).json({ message: "Internal server error" });
-//         res.redirect('/home');
-//     }
-// };
 
 // Configure your Razorpay credentials
 
@@ -491,12 +375,13 @@ const loadorderconfirmed = async (req, res) => {
         console.log(orderId,"id order");
         const order = await orderModel.findOne({ oId: orderId }).populate('items.productId');
         console.log(order,'order is there')
+        const cart = await cartModel.findOne({ owner: req.session.user })
         if (!order) {
             // Handle the case where an order is not found
             return res.status(404).render('errorPage', { message: "Order not found" });
         }
         // If the order is found, render the order confirmed page with the order details
-        res.render('orderconfirmed', { order: order });
+        res.render('orderconfirmed', { order: order, cart:cart });
     } catch (error) {
         console.error("Error retrieving order:", error);
         // Handle any other errors, such as database connection issues
@@ -705,23 +590,61 @@ const razorpayVerify = async (req, res) => {
     }
 }
 
-const revisePayment = async(req,res)=>{
-    try{
-        console.log(req.session.order);
-        const orders = await orderModel.findOne({_id:req.session.order});
-        console.log(orders,"orders vannu");
-        const order = await instance.orders.create({
-            amount: orders.billTotal * 100, 
+// const revisePayment = async(req,res)=>{
+//     try{
+//         console.log(req.session.order);
+//         const orders = await orderModel.findOne({_id:req.session.order});
+//         console.log(orders,"orders vannu");
+//         const order = await instance.orders.create({
+//             amount: orders.billTotal * 100, 
+//             currency: "INR",
+//             receipt: await generateUniqueOrderID(),
+//        });
+        
+
+//         console.log(order+'kittum');
+//         res.json({order})
+//     }catch(error){
+//         console.log(error.message);
+//     }
+// }
+
+const revisePayment = async (req, res) => {
+    try {
+        const orderId = req.session.order;
+        if (!orderId) {
+            return res.status(400).json({ message: 'Order ID not found in session.' });
+        }
+
+        const orders = await orderModel.findOne({ _id: orderId });
+        if (!orders) {
+            return res.status(404).json({ message: 'Order not found.' });
+        }
+        console.log(orders.billTotal,"came")
+
+        var options = {
+            amount: orders.billTotal*100,
             currency: "INR",
             receipt: await generateUniqueOrderID(),
+            };
+    
+        const order = await new Promise((resolve, reject) => {
+            instance.orders.create(options, function (err, order) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(order);
+                }
+            });
         });
+        console.log(order);
 
-        console.log(order+'kittum');
-        res.json({order})
-    }catch(error){
-        console.log(error.message);
+        res.json({ order });
+    } catch (error) {
+        console.error('Error revising payment:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
     }
-}
+};
 
 
 const wallet = async (req, res) => {

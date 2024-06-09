@@ -627,7 +627,7 @@ const monthlyData = async(req,res)=>{
 
     const sorted = orders.map(order => ({
       ...order,
-      _id: new Date(order._id.split('-').reverse().join('-') + '-01T00:00:00')
+      _id: new Date(order._id.split('-').reverse().join('-') + 'T00:00:00')
     })).sort((a,b)=>a._id - b._id);
 
     const yValues = sorted.map(order => order.totalAmount);
@@ -664,8 +664,8 @@ const dailyData = async(req,res)=>{
 
     const sorted = orders.map(order => ({
       ...order,
-      _id: new Date(order._id.split('-').reverse().join('-') + '-01T00:00:00')
-    })).sort((a,b)=>a._id - b._id);
+      _id: new Date(order._id.split('-').reverse().join('-') + 'T00:00:00') 
+  })).sort((a, b) => a._id - b._id);
 
     const yValues = sorted.map(order => order.totalAmount);
     const xValues = sorted.map(order => order._id.toLocaleDateString('en-GB'));
@@ -675,6 +675,85 @@ const dailyData = async(req,res)=>{
     console.log(error.message)
   }
 }
+
+const topProducts = async (req, res) => {
+  try {
+      const topProducts = await productModel.find().sort({ popularity: -1 }).limit(10).populate('category');
+      res.json(topProducts);
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+};
+
+
+// const topCategory = async(req,res)=>{
+//   try {
+//     const topCategories = await productModel.aggregate([
+//         {
+//             $group: {
+//                 _id: "$category",
+//                 totalPopularity: { $sum: "$popularity" }
+//             }
+//         },
+//         {
+//             $sort: { totalPopularity: -1 }
+//         },
+//         {
+//             $limit: 10
+//         },
+//         {
+//             $lookup: {
+//                 from: 'categories',
+//                 localField: '_id',
+//                 foreignField: '_id',
+//                 as: 'categoryDetails'
+//             }
+//         },
+//         {
+//             $unwind: "$categoryDetails"
+//         }
+//     ]);
+//     res.json({topCategories});
+// } catch (err) {
+//     res.status(500).json({ message: err.message });
+// }
+// }
+const topCategory = async (req, res) => {
+  try {
+      const topCategories = await productModel.aggregate([
+          {
+              $group: {
+                  _id: "$category",
+                  totalPopularity: { $sum: "$popularity" }
+              }
+          },
+          {
+              $sort: { totalPopularity: -1 }
+          },
+          {
+              $limit: 10
+          },
+          {
+              $lookup: {
+                  from: 'categories',
+                  localField: '_id',
+                  foreignField: '_id',
+                  as: 'categoryDetails'
+              }
+          },
+          {
+              $unwind: "$categoryDetails"
+          }
+      ]);
+
+      console.log(topCategories,"kkk"); // Log the response for debugging
+
+      res.json(topCategories);
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+};
+
 
 module.exports = {
     loadLogin,
@@ -694,5 +773,7 @@ module.exports = {
     filterProducts,
     loadCharts,
     monthlyData,
-    dailyData
+    dailyData,
+    topProducts,
+    topCategory
 }

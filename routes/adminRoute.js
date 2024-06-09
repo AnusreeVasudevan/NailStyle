@@ -69,6 +69,8 @@ admin_route.post('/addproduct',upload,productController.addProduct)
 admin_route.get('/dashboard',adminController.loadCharts)
 admin_route.post('/monthly',adminController.monthlyData);
 admin_route.post('/daily',adminController.dailyData);
+admin_route.get('/topproducts',adminController.topProducts);
+admin_route.get('/topcategory',adminController.topCategory);
 
 
 

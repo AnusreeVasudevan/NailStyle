@@ -34,27 +34,39 @@
         <nav>
             <ul class="menu-aside">
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/userlist"> <!-- Placeholder link for Users -->
+                    <a class="menu-link" href="/admin/userlist">
                         <i class="icon material-icons md-person"></i>
                         <span class="text">Users</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/product"> <!-- Placeholder link for Products -->
+                    <a class="menu-link" href="/admin/product">
                         <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/category"> <!-- Placeholder link for Categories -->
-                        <i class="icon material-icons md-star"></i>
+                    <a class="menu-link" href="/admin/category">
+                        <i class="icon material-icons md-category"></i>
                         <span class="text">Categories</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/order"> <!-- Placeholder link for orders -->
-                        <i class="icon material-icons md-menu"></i>
+                    <a class="menu-link" href="/admin/order">
+                        <i class="icon material-icons md-local_shipping"></i>
                         <span class="text">Orders</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/coupon">
+                        <i class="icon material-icons md-redeem coupon-icon"></i>
+                        <span class="text">Coupons</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/dashboard">
+                        <i class="icon material-icons md-analytics"></i>
+                        <span class="text">Dashboard</span>
                     </a>
                 </li>
             </ul>
@@ -373,7 +385,7 @@
                                             </td>
                                             <td>
                                                 <% if(users[i].is_blocked) { %>
-                                                    <button onclick="confirmAction('<%= users[i]._id %>', 'unblock')" class="btn btn-primary">Unblock</button>
+                                                    <button onclick="confirmAction('<%= users[i]._id %>', 'unblock')" class="btn btn-danger">Unblock</button>
                                                 <% } else { %>
                                                     <button onclick="confirmAction('<%= users[i]._id %>', 'block')" class="btn btn-primary">Block</button>
                                                 <% } %>

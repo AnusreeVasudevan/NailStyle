@@ -272,3 +272,102 @@ console.log(cat)
                             }
                           };
                           
+
+
+                          const topCategory = async(req,res)=>{
+                            try {
+                              const topCategories = await productModel.aggregate([
+                                  {
+                                      $group: {
+                                          _id: "$category",
+                                          totalPopularity: { $sum: "$popularity" }
+                                      }
+                                  },
+                                  {
+                                      $sort: { totalPopularity: -1 }
+                                  },
+                                  {
+                                      $limit: 10
+                                  },
+                                  {
+                                      $lookup: {
+                                          from: 'categories',
+                                          localField: '_id',
+                                          foreignField: '_id',
+                                          as: 'categoryDetails'
+                                      }
+                                  },
+                                  {
+                                      $unwind: "$categoryDetails"
+                                  }
+                              ]);
+                              res.json(topCategories);
+                          } catch (err) {
+                              res.status(500).json({ message: err.message });
+                          }
+                          } this is my function to take top selling categories, <div class="card mb-4">
+                                                  <article class="card-body">
+                                                      <h5 class="card-title">Revenue Base on Area</h5>
+                                                      <canvas id="myChart2" height="217"></canvas>
+                                                  </article>
+                                              </div> this is my ejs template part, admin_route.get('/topcategory',adminController.topCategory);
+                           this is my route, const mongoose = require('mongoose');
+                          
+                          const productSchema = new mongoose.Schema({
+                            name: {
+                              type: String,
+                              required: true,
+                            },
+                            description: {
+                              type: String,
+                              required: true,
+                            },
+                            images: [{
+                              type: String,
+                            }],
+                            category: {
+                              type: mongoose.Schema.Types.ObjectId,
+                              ref: 'category',
+                              required: true,
+                            },
+                            price: {
+                              type: Number,
+                              required: true,
+                              default: 0,
+                            },
+                            discountPrice: {
+                              type: Number,
+                              default: 0,
+                            },
+                            discount:Number,
+                            countInStock: {
+                              type: Number,
+                              required: true,
+                              min: 0,
+                              // max: 100,
+                            },
+                            rating: {
+                              type: Number,
+                              default: 0,
+                            },
+                            isFeatured: {
+                              type: Boolean,
+                              default: false, 
+                            },
+                            is_deleted: {
+                              type: Boolean,
+                              default: false, 
+                            },
+                              popularity: {
+                                type:Number,
+                                default: 0
+                              }
+                            
+                          }, {
+                            timestamps: true
+                          });
+                          
+                          const ProductModel = mongoose.model('Products', productSchema);
+                          
+                          module.exports = ProductModel;
+                           this is my product model,   i want to show the top selling categories in the progress bars like the top selling products we did before

@@ -134,7 +134,7 @@ const getOtp = async(req,res)=>{
 
 const loadHome = async(req,res)=>{
     try{
-       const product=await ProductModel.find();
+       const product=await ProductModel.find().sort({createdAt:-1});
        if(!product){
         product=null;
        }
@@ -222,38 +222,6 @@ let resendOtp = async (req, res) => {
 
 const loadShop = async(req, res) => {
     try {
-    //     let sortOption = {};
-
-    //     switch(req.query.sort) {
-    //         case 'rating':
-    //             sortOption = { rating: -1 }; 
-    //             break;
-    //         case 'priceAsc':
-    //             sortOption = { discountPrice: 1 }; 
-    //             break;
-    //         case 'priceDesc':
-    //             sortOption = { discountPrice: -1 }; 
-    //             break;
-    //         case 'newness':
-    //             sortOption = { createdAt: -1 }; 
-    //             break;
-    //         case 'nameAsc':
-    //             sortOption = { name: 1 }; 
-    //             break;
-    //         case 'nameDesc':
-    //             sortOption = { name: -1 }; 
-    //             break;
-            
-    //         default:
-    //             sortOption = { createdAt: -1 }; 
-    //             break;
-    //     }
-
-    //     const product = await ProductModel.find().sort(sortOption);
-    //     if(!product) {
-    //         product = null;
-    //     }
-        // console.log(product, "pdt detailssssssssssssssssssss");
         const category = await categoryModel.find({is_active:false});
         if(req.session.search){
             search = req.session.search;
@@ -268,6 +236,7 @@ const loadShop = async(req, res) => {
 
 
 const loadForgotPasswordemail = async(req,res)=>{
+    console.log("entered in forget passsword")
     try{
         res.render('emailforgotpassword');
     }catch(error){
@@ -280,12 +249,7 @@ const loadpasswordReset = async (req, res) => {
     try {
         // If there's a need to send OTP
         if (req.body.email && !req.body.otp) {
-            // Check if user exists in the database
             const user = await User.findOne({ email: req.body.email });
-            // if (!user) {
-            //     // If no user is found, respond accordingly
-            //     return res.status(404).json({ message: "User not found." });
-            // }
             if(!user){
                 req.flash('error','User Not Found');
                 console.log("User Not Found");
@@ -355,50 +319,6 @@ const passwordReset = async (req, res) => {
         res.status(500).send({ error: 'An error occurred while processing your request.' });
     }
 };
-
-// const loaduserprofile=async(req,res)=>{
-//     try{
-//         let address = await addressModel.findOne({
-//           user: req.session.user
-//         }) || null;
-//         const orders=await orderModel.findOne({
-//           user: req.session.user
-//         }) || null;
-//         const user=await User.findById(req.session.user);
-//         // let wallet=await walletModel.findOne({
-//         //   user: user._id
-//         // });
-//         // if(!address){
-//         //   address=null;
-//         // }
-//         // if(!wallet){
-//         //   wallet=null;
-//         // }
-//         // let wish=await wishlistModel.findOne({user:user._id});
-//         //           if(!wish){
-//         //             wish=null;
-//         //           }
-//         //           let cart=await cartModel.findOne({owner:user._id})
-//         //           if(!cart)
-//         //           {
-//         //           cart=null;
-//         //           }
-
-//         console.log(orders,'orderrrrrrrrrrrrrr');
-        
-//       res.render('userProfile',{user,address,orders});
-//     //   res.render('user-detail',{user,address,wallet,wish,cart});
-      
-      
-//     }
-//     catch(error){
-//       console.log('loaduserProfile',error.message);
-//     }      
-  
-//   };
-
-
-
 
 
 const loaduserprofile = async (req, res) => {
@@ -861,8 +781,8 @@ const downloadInvoice = async(req,res)=>{
         console.log(req.body)
         console.log(req.params)
         const  {oId}  = req.params;
-        const orders = await orderModel.findOne({oId:oId}).populate('user').populate('items.productId');
-        console.log("jhgsjdhga"+orders.deliveryAddress,'orderszzz');
+        const orders = await orderModel.findOne({_id:oId}).populate('user').populate('items.productId');
+        console.log("jhgsjdhga "+orders,'orderszzz');
         const htmlContent = fs.readFileSync('./views/user/invoice-pdf.ejs', 'utf8');
         const template = handlebars.compile(htmlContent);
         let discount,shipping
@@ -920,7 +840,7 @@ console.log(orders,'1111111111111');
                 <td></td>
                 <td></td>
                 <td>Total<br>Discounts<br>Shipping<br><span style="color:blue">Grand Total</span></td>
-                <td>${orders.billTotal}<br>${orders.discountPrice}<br>${shipping}<br><span style="color:blue">${orders.billTotal}</span></td>
+                <td>${orders.billTotal}<br>${orders.discountPrice}<br>${shipping}<br><span style="color:blue">${orders.discountPrice}</span></td>
                 </tr>
             `;    
         tableContent += `
@@ -960,9 +880,10 @@ console.log(orders,'1111111111111');
 
 const loadMyProducts = async (req,res)=>{
     try{
+        let {category,minamount,maxamount,sort,stock,search,page} = req.body.obj
         let sortOption = {};
 
-        switch(req.query.sort) {
+        switch(sort) {
             case 'rating':
                 sortOption = { rating: -1 }; 
                 break;
@@ -986,7 +907,6 @@ const loadMyProducts = async (req,res)=>{
                 sortOption = { createdAt: -1 }; 
                 break;
         }
-         let {category,minamount,maxamount,sort,stock,search,page} = req.body.obj
          console.log(category,minamount,maxamount,sort,stock,search,page,"MyData")
          if(search)
             req.session.search = search;
@@ -997,8 +917,8 @@ const loadMyProducts = async (req,res)=>{
             }else{
                 stock = 0;
             }
-            let limit = 3
-            const product = await ProductModel.find({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount},countInStock:{$gte:stock},name: { $regex: new RegExp(search,"i") },description: {$regex: new RegExp(search,"i")}}).skip((page-1)*3).limit(limit).sort(sortOption);
+            let limit = 4 , skip = (page-1)*limit
+            const product = await ProductModel.find({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount},countInStock:{$gte:stock},name: { $regex: new RegExp(search,"i") },description: {$regex: new RegExp(search,"i")}}).sort(sortOption).skip(skip).limit(limit);
             const pro = await ProductModel.countDocuments({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount},countInStock:{$gte:stock},name: { $regex: new RegExp(search,"i") },description: {$regex: new RegExp(search,"i")}});
             // const product = await ProductModel.countDocuments({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount}}).sort(sortOption);
         //  console.log(category,"mycategory")

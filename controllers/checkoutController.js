@@ -8,6 +8,8 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const walletModel = require("../models/walletModel");
 const categoryModel = require("../models/categoryModel");
+const { log } = require("console");
+const { path } = require("pdfkit");
 
 
 const loadcheckout = async (req, res) => {
@@ -35,90 +37,113 @@ const loadcheckout = async (req, res) => {
 
 };
 
-const razorpayFn=async (req,res)=>{
-    console.log('enterd in the fn');
-    const {a_id,pay}=req.body.data
-    const {user,c_id}=req.session
-    const address = await addressModel.findOne({
-        user: user,
-       'addresses._id': a_id
-    },{
-        'addresses.$': 1 // Use the positional $ operator to fetch only the matching address
-    })
-    console.log(address,'got address');
-    const cart=await cartModel.findOne(c_id).populate('items.productId')
-    const order_id = await generateUniqueOrderID();
 
-    console.log(process.env.rzId,"zzzz",cart.billTotal,"cart bill");
 
-    const url=`orderconfirmed?id=${order_id}`
-    var instance = new Razorpay({ key_id: process.env.rzKey, key_secret: process.env.rzId })
-    var options = {
-        amount: cart.billTotal*100,
-        currency: "INR",
-        receipt: await generateUniqueOrderID(),
-        };
+const razorpayFn = async (req, res) => {
+    try {
+        console.log('Entered in the function');
 
-    const order = await new Promise((resolve, reject) => {
-        instance.orders.create(options, function (err, order) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(order);
-            }
+        const { a_id, pay } = req.body.data;
+        
+        const cart=await cartModel.findOne({owner:req.session.user}).populate('items.productId');
+      console.log(cart,'........');
+
+        // Fetch the specific address
+        const address = await addressModel.findOne({
+            user: req.session.user,
+            'addresses._id': a_id
+        }, {
+            'addresses.$': 1 // Use the positional $ operator to fetch only the matching address
         });
-    });
 
-            // const order = await instance.orders.create({
-            //     amount: cart.billTotal * 100, 
-            //     currency: "INR",
-            //     receipt: await generateUniqueOrderID(),
-                
-            // });
-            console.log(order)
-            console.log(address,a_id,'address, a_id');
+        console.log(address, 'Got address');
 
+        // Populate cart items with product details
+        
 
+        // Generate a unique order ID
+        const order_id = await generateUniqueOrderID();
+        console.log(process.env.rzId, "Razorpay Key ID", cart.billTotal, "Cart bill total");
 
-            const orderData = new orderModel({
-                user: user,
-                oId: order_id,
-                deliveryAddress: address.addresses[0],
-                billTotal:cart.billTotal,
-                // paymentStatus: "Pending",
-                paymentMethod: pay,
-                coupon: cart.coupon,
-                discountPrice: cart.discountPrice
+        const url = `orderconfirmed?id=${order_id}`;
+        const instance = new Razorpay({ key_id: process.env.rzKey, key_secret: process.env.rzId });
+
+        const options = {
+            amount: cart.billTotal * 100, // Razorpay accepts amount in paise
+            currency: "INR",
+            receipt: order_id
+        };
+        console.log(options, 'Payment options');
+
+        // Create an order in Razorpay
+        const order = await new Promise((resolve, reject) => {
+            instance.orders.create(options, (err, order) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(order);
+                }
             });
-            
-            for (const item of cart.items) {
-                orderData.items.push({
-                    productId: item.productId._id,
-                    image: item.productId.images[0],
-                    name: item.productId.name,
-                    productPrice: item.productId.price,
-                    quantity: item.quantity,
-                    price: item.price
-                })
-            }
+        });
 
-            await orderData.save();
-            console.log("!!!!!",orderData,'order data');
-            req.session.orderId = orderData._id;
-             // Update stock levels
-            for (const item of cart.items) {
-                const product = await productModel.findOne({ _id: item.productId });
-                product.countInStock -= item.quantity;
-                product.popularity += item.quantity;
-                await product.save();
-            }
+        console.log(order, "Razorpay order created");
 
-            // Clear the cart
-            cart.items = [];
-            await cart.save();
-            const resurl = orderData._id;
-            res.json({order,resurl})
-}
+        const orderData = new orderModel({
+            user: req.session.user,
+            oId: order_id,
+            deliveryAddress: address.addresses[0],
+            billTotal: cart.billTotal,
+            paymentMethod: pay,
+            coupon: cart.coupon,
+            discountPrice: cart.discountPrice
+        });
+
+        console.log(orderData, "Order data before adding items");
+
+        // Add items to the order
+        for (const item of cart.items) {
+            orderData.items.push({
+                productId: item.productId._id,
+                image: item.productId.images[0],
+                name: item.productId.name,
+                productPrice: item.productId.price,
+                quantity: item.quantity,
+                price: item.price
+            });
+        }
+        await orderData.save();
+
+        console.log(orderData, "Order data after adding items");
+
+        // Save the order
+       
+      
+
+        req.session.orderId = orderData._id;
+
+        // Update stock levels and product popularity
+        for (const item of cart.items) {
+            const product = await productModel.findById(item.productId._id);
+            product.countInStock -= item.quantity;
+            product.popularity += item.quantity;
+            await product.save();
+        }
+
+        // Clear the cart
+        cart.items = [];
+        await cart.save();
+
+        const resurl = orderData._id;
+        console.log(resurl, "Response URL");
+
+        res.json({ order, resurl });
+
+    } catch (error) {
+        console.error("Error in Razorpay function:", error);
+        res.status(500).json({ message: "An error occurred while processing your order." });
+    }
+};
+
            
 // const codFn=async (req,res)=>{
 //     const {a_id,pay}=req.body.data
@@ -372,10 +397,11 @@ const loadorderconfirmed = async (req, res) => {
     try {
         // Retrieve the order details using the order ID from the query string
         const orderId = req.query.id;
-        console.log(orderId,"id order");
-        const order = await orderModel.findOne({ oId: orderId }).populate('items.productId');
+        console.log(orderId,"id order in confirm");
+        const order = await orderModel.findOne({ _id: orderId }).populate('items.productId');
         console.log(order,'order is there')
         const cart = await cartModel.findOne({ owner: req.session.user })
+        console.log(req.session.user,"session user")
         if (!order) {
             // Handle the case where an order is not found
             return res.status(404).render('errorPage', { message: "Order not found" });
@@ -399,8 +425,8 @@ const payment = async(req,res)=>{
         console.log(order,"order before saving");
         order.payId = razor;
         await order.save();
-        console.log(order,"order after saving");
-        res.render('orderconfirmed',{order});
+        console.log(order,"after",razor,"order after saving");
+        res.redirect(`orderconfirmed?id=${order._id}`);
     }catch(error){
         console.log(error.message);
     }

@@ -37,15 +37,8 @@ const loadRegister = async(req,res)=>{
 
 const insertUser = async (req, res) => {
     try {
-        // Check if passwords match
-        // if (req.body.password === req.body.confirm_password) {
-        //     console.log('okkkkkkkkkkkkkkk');
-        //     res.redirect('/verifyOTP'); // Redirect back to registration page with an error message
-        // }
-
         // Generate OTP
         const otp = generateOTP();
-        console.log(otp);
 
         // Storing into session
         req.session.Data = { ...req.body, otp };
@@ -93,12 +86,6 @@ const getOtp = async(req,res)=>{
 
         if(otpInBody === otp){
             const {name,email,mobile,password} = req.session.Data
-            console.log("username:",name);
-            console.log("email:",email);
-            console.log("mobile:",mobile); // Fix: Use `mobile` instead of `mobileno`
-            console.log("password:",password); // Fix: Use `password` instead of `userpassword`
-
-            // const passwordHash = await bcrypt.hash(password,10);
             const passwordHash = await securePassword(req.session.Data.password);
             const existingUser = await User.findOne({email:email})
             if(!existingUser){
@@ -112,8 +99,12 @@ const getOtp = async(req,res)=>{
                     is_blocked: false
                 });
                 await user.save();//save to db
-            }
+                req.session.user = user
+                console.log(req.session.user,"userrrr");
 
+            }
+            // req.session.user = user
+            console.log(req.session.user,"userrrr");
 
      
         // Create a new wallet only if it doesn't exist

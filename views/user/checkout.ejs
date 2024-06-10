@@ -1260,7 +1260,7 @@
             body: JSON.stringify({ data })
         })
         let { order,resurl } = await res.json()
-
+        console.log(resurl,"resss")
         var options = {
             key: 'rzp_test_qe0OyVuUrveEp3',
             amount: order.amount,

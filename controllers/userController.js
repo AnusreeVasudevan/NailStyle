@@ -842,7 +842,10 @@ console.log(orders,'1111111111111');
         const renderedHtml = template( {tableContent,addresscontent} );
 
         console.log(844);
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            headless:false,
+            args: ["--no-sandbox"]
+        });
         console.log(846);
         const paged = await browser.newPage();
 

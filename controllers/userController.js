@@ -838,17 +838,22 @@ console.log(orders,'1111111111111');
                 </tbody>
             </table>
         `;
+        console.log(841);
         const renderedHtml = template( {tableContent,addresscontent} );
 
+        console.log(844);
         const browser = await puppeteer.launch();
+        console.log(846);
         const paged = await browser.newPage();
 
+        console.log(849);
         const marginOptions = {
             top: '1cm',
             bottom: '1cm',
             left: '1cm',
             right: '1cm'
         };
+        console.log(856);
 
         await paged.setContent(renderedHtml);
         const pdfBuffer = await paged.pdf({

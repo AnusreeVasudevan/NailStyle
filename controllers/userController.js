@@ -769,17 +769,13 @@ const returnOrder = async (req, res) => {
 const downloadInvoice = async(req,res)=>{
     console.log("invoice download");
     try{
-        console.log(req.body)
-        console.log(req.params)
         const  {oId}  = req.params;
         const orders = await orderModel.findOne({_id:oId}).populate('user').populate('items.productId');
-        console.log("jhgsjdhga "+orders,'orderszzz');
         const htmlContent = fs.readFileSync('./views/user/invoice-pdf.ejs', 'utf8');
         const template = handlebars.compile(htmlContent);
         let discount,shipping
         if(orders.coupondiscount==NaN){
             discount=orders.coupondiscount
-
         }
         else{
             discount="NA"
@@ -838,14 +834,11 @@ console.log(orders,'1111111111111');
                 </tbody>
             </table>
         `;
-        console.log(841);
+        console.log(tableContent,addresscontent);
         const renderedHtml = template( {tableContent,addresscontent} );
 
         console.log(844);
-        const browser = await puppeteer.launch({
-            headless:false,
-            args: ["--no-sandbox"]
-        });
+        const browser = await puppeteer.launch();
         console.log(846);
         const paged = await browser.newPage();
 

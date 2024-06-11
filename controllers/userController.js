@@ -767,7 +767,7 @@ const returnOrder = async (req, res) => {
 };
 
 const downloadInvoice = async(req,res)=>{
-    console.log("invoice downloaded");
+    console.log("invoice download");
     try{
         console.log(req.body)
         console.log(req.params)

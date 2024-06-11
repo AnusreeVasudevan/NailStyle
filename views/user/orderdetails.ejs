@@ -794,7 +794,7 @@
                         <form action="" method="post">
                             <input type="hidden" id="id" value="<%= order.oId %>">
                             <div class="order_button pt-3">
-                                <button class="btn btn-md btn-black-default-hover" onclick="retryPayment()" id="proceedButton" type="button">Retry payment</button>
+                                <button class="btn btn-md btn-black-default-hover" onclick="retryPayment('<%= order.oId %>')" id="proceedButton" type="button">Retry payment</button>
                             </div>
                         </form>
                         <br>
@@ -1289,6 +1289,7 @@
 
 <script>
     async function downloadInvoice(oId){
+        console.log("hi");
         console.log(oId,'22222');
         const invoice = await fetch(`/downloadinvoice/${oId}`,{
         method:'POST',
@@ -1321,13 +1322,13 @@
 </script>
 
 <script>
-    async function retryPayment() {
+    async function retryPayment(oId) {
         try {
             const res = await fetch('/retrypayment', {
                 method: 'post',
             });
             const { order } = await res.json();
-    
+    console.log(order.amount,"orderamount")
             var options = {
                 key: 'rzp_test_qe0OyVuUrveEp3',
                 amount: order.amount,

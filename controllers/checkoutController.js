@@ -637,7 +637,9 @@ const razorpayVerify = async (req, res) => {
 
 const revisePayment = async (req, res) => {
     try {
+        console.log("----------------------")
         const orderId = req.session.order;
+        console.log(orderId)
         if (!orderId) {
             return res.status(400).json({ message: 'Order ID not found in session.' });
         }
@@ -653,16 +655,17 @@ const revisePayment = async (req, res) => {
             currency: "INR",
             receipt: await generateUniqueOrderID(),
             };
-    
-        const order = await new Promise((resolve, reject) => {
-            instance.orders.create(options, function (err, order) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(order);
-                }
+    console.log(options)
+            const order = await new Promise((resolve, reject) => {
+                instance.orders.create(options, (err, order) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(order);
+                    }
+                });
             });
-        });
+        console.log("============================")
         console.log(order);
 
         res.json({ order });

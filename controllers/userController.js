@@ -642,8 +642,9 @@ const editAddress = async (req, res) => {
         await addresses.save();
         const user=await User.findById(req.session.user)
         const orders = await orderModel.findOne({user:user._id});
+        const wallet = await walletModel.findOne({user:req.session.user})
         // Render the editAddress template with the updated addresses
-        return res.render('userProfile', { address:addresses, message: 'Updated successfully!' ,user,orders});
+        return res.render('userProfile', { address:addresses, message: 'Updated successfully!' ,user,orders,wallet});
     } catch (err) {
         console.error('editAddress:', err.message);
         // Handle errors

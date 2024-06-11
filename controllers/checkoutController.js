@@ -308,7 +308,7 @@ const codFn = async (req, res) => {
 
     const order_id = await generateUniqueOrderID();
 
-    const url = `orderconfirmed?id=${order_id}`;
+    // const url = `orderconfirmed?id=${order_id}`;
 
     const orderData = new orderModel({
         user: user,
@@ -345,7 +345,7 @@ const codFn = async (req, res) => {
     // Clear the cart
     cart.items = [];
     await cart.save();
-
+    const url = `orderconfirmed?id=${orderData._id}`;
     res.json({ url });
 };
 
@@ -693,7 +693,7 @@ const wallet = async (req, res) => {
 
     const order_id = await generateUniqueOrderID();
 
-    const url = `orderconfirmed?id=${order_id}`;
+    // const url = `orderconfirmed?id=${order_id}`;
 
     const orderData = new orderModel({
         user: user,
@@ -747,6 +747,7 @@ const wallet = async (req, res) => {
     // Clear the cart
     cart.items = [];
     await cart.save();
+    const url = `orderconfirmed?id=${orderData._id}`;
 
     res.json({ url });
 };

@@ -83,7 +83,7 @@ const loadEdit = async (req, res) => {
         const catData = await categoryModel.find({});
 
         // Render the editProduct page with the retrieved data
-        res.render("editProduct", { catData, proData });
+        res.render("editproduct", { catData, proData });
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');

@@ -22,16 +22,16 @@ const loginLoad = async(req,res)=>{
     try{
         res.render('login');
     } catch(error){
-        console.log(error.message); 
+        //console.log(error.message); 
     }
 }
 
 const loadRegister = async(req,res)=>{
     try{
-        console.log('hlo................');
+        //console.log('hlo................');
         res.render('register');
     } catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
@@ -43,16 +43,16 @@ const insertUser = async (req, res) => {
         // Storing into session
         req.session.Data = { ...req.body, otp };
         req.session.save();
-        console.log(req.session, 'this is session');
+        //console.log(req.session, 'this is session');
 
-        console.log(otp);
-        console.log(req.session.Data.otp, 'wWWWWWW');
+        //console.log(otp);
+        //console.log(req.session.Data.otp, 'wWWWWWW');
         const sentEmail = await sendInsertOtp(req.body.email, otp);
         if (sentEmail) {
             res.redirect('/verifyOTP');
         }
     } catch (error) {
-        console.log('otp',error.message);
+        //console.log('otp',error.message);
         // res.status(500).send('Internal Server Error');
     }
 };
@@ -64,7 +64,7 @@ const loadOtp = async(req,res)=>{
     try{
         res.render('verifyOTP',{message:null});
     }catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
@@ -73,15 +73,15 @@ const securePassword = async (password) => {
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
-        console.log(error.message);
+        //console.log(error.message);
     }
 };
     
 const getOtp = async(req,res)=>{
-    // console.log("ssjtgjuykdfg")
+    // //console.log("ssjtgjuykdfg")
     try{
         const otpInBody = req.body.otp;
-        console.log(otpInBody,'otp...............................');
+        //console.log(otpInBody,'otp...............................');
         const otp = req.session.Data.otp;
 
         if(otpInBody === otp){
@@ -100,11 +100,11 @@ const getOtp = async(req,res)=>{
                 });
                 await user.save();//save to db
                 req.session.user = user
-                console.log(req.session.user,"userrrr");
+                //console.log(req.session.user,"userrrr");
 
             }
             // req.session.user = user
-            console.log(req.session.user,"userrrr");
+            //console.log(req.session.user,"userrrr");
 
      
         // Create a new wallet only if it doesn't exist
@@ -117,7 +117,7 @@ const getOtp = async(req,res)=>{
             return res.status(400).json({error:"otp invalid"}); 
         }
     } catch (error) {
-        console.log('Error in OTP verification:', error);
+        //console.log('Error in OTP verification:', error);
         return res.render('verifyOTP', { message: 'An error occurred during OTP verification. Please try again later.' });
     }
 };
@@ -131,7 +131,7 @@ const loadHome = async(req,res)=>{
        }
         res.render('home',{product});
     }catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
@@ -139,38 +139,38 @@ const verifyLogin = async(req,res)=>{
     try{
         
         const { email,password } = req.body;
-       // console.log(email,password );
+       // //console.log(email,password );
         if(!email || !password){
             req.flash('error',"Email and Password are required");
-            console.log("Email and Password are required");
+            //console.log("Email and Password are required");
             return res.redirect('/login');
         }
         const userData = await User.findOne({ email });
-       // console.log(userData);
+       // //console.log(userData);
         if(!userData){
             req.flash('error','User Not Found');
-            console.log("User Not Found");
+            //console.log("User Not Found");
             return res.redirect('/login');
         }
         if(userData.is_blocked){
             req.flash('error','Sorry!!! User is Blocked');
-            console.log("User is blocked");
+            //console.log("User is blocked");
             return res.redirect('/login');
         }
         const hashedPassword = await bcrypt.compare(password,userData.password);
         if(!hashedPassword){
             req.flash('error','Invalid Password');
-            console.log("invalid password");
+            //console.log("invalid password");
             return res.redirect('/login');
         }
         if(email===userData.email && hashedPassword ){
             req.session.user = userData._id;
-            console.log(168,req.session.user);
+            //console.log(168,req.session.user);
             res.redirect('/home');
         }
         
     } catch(error){
-        console.log(error.message);
+        //console.log(error.message);
         return res.status(500).json({message: "Internal Server Error"});
     }
 }
@@ -180,7 +180,7 @@ const verifyLogin = async(req,res)=>{
 let resendOtp = async (req, res) => {
     try {
         const otp = generateOTP();
-        // console.log(req.session.Data.email,otp);
+        // //console.log(req.session.Data.email,otp);
          await sendInsertOtp(req.session.Data.email, otp);
     
             req.session.Data.otp=otp;
@@ -206,7 +206,7 @@ let resendOtp = async (req, res) => {
         req.session.user=false;
         res.redirect('/');
     }catch(error){
-        console.log(error.message)
+        //console.log(error.message)
     }
 }
 
@@ -220,17 +220,17 @@ const loadShop = async(req, res) => {
         }
         res.render('shop',{category,search});
     } catch(error) {
-        console.log(error.message);
+        //console.log(error.message);
     }
 };
 
 
 const loadForgotPasswordemail = async(req,res)=>{
-    console.log("entered in forget passsword")
+    //console.log("entered in forget passsword")
     try{
         res.render('emailforgotpassword');
     }catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
@@ -242,7 +242,7 @@ const loadpasswordReset = async (req, res) => {
             const user = await User.findOne({ email: req.body.email });
             if(!user){
                 req.flash('error','User Not Found');
-                console.log("User Not Found");
+                //console.log("User Not Found");
                 return res.redirect('/login');
             }
             const otp = generateOTP();
@@ -271,7 +271,7 @@ const loadForgotPassword = async(req,res)=>{
     try{
         res.render('forgotpassword');
     }catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
@@ -313,17 +313,17 @@ const passwordReset = async (req, res) => {
 
 const loaduserprofile = async (req, res) => {
   try {
-    console.log(req.session.user)
+    //console.log(req.session.user)
       let address = await addressModel.findOne({ user: req.session.user }) || null;
       const orders = await orderModel.find({ user: req.session.user }).sort({ orderDate: -1 }) || [];
       const user = await User.findById(req.session.user);
       let wallet = await walletModel.findOne({user:req.session.user})|| { balance: 0, transactions: [], actions:[] };
-        console.log(wallet,"mywallet")
+        //console.log(wallet,"mywallet")
     
-    //   console.log( orders,'AAAAAAA');
+    //   //console.log( orders,'AAAAAAA');
       res.render('userProfile', { user, address, orders, wallet });
   } catch (error) {
-      console.log('loaduserProfile Error:', error.message);
+      //console.log('loaduserProfile Error:', error.message);
   }
 };
 
@@ -381,7 +381,7 @@ const loaduserprofile = async (req, res) => {
 
       }
     } catch (error) {
-      console.log('editprofile', error.message);
+      //console.log('editprofile', error.message);
      
     }
   };
@@ -390,7 +390,7 @@ const loaduserprofile = async (req, res) => {
     try{
         res.render('addAddress');
     } catch(error){
-        console.log(error.message); 
+        //console.log(error.message); 
     }
 }
 
@@ -412,9 +412,9 @@ const addAddress = async (req, res) => {
   
    
       const user = await User.findById(req.session.user);
-      // console.log(user);
+      // //console.log(user);
       if (!user) {
-       console.log('user is not found');
+       //console.log('user is not found');
       }
   
      
@@ -492,22 +492,22 @@ const addAddress = async (req, res) => {
     }
     } catch (err) {
     
-      console.log('addaddress:',err.message)
+      //console.log('addaddress:',err.message)
     }
   };
 
   const loadeditAddress=async(req,res)=>{
     try{
       const user= await User.findById(req.session.user);
-      // console.log(user)
+      // //console.log(user)
       let useraddresses = await addressModel.findOne({
         user:user._id
       });
-      //console.log(useraddresses)
+      ////console.log(useraddresses)
       const addressType=req.query.addressType;
       
       const address = useraddresses.addresses.find(address => address.addressType === addressType);
-   // console.log(address);
+   // //console.log(address);
 //    let wish=await wishlistModel.findOne({user:user._id});
 //    if(!wish){
 //      wish=null;
@@ -524,14 +524,14 @@ const addAddress = async (req, res) => {
     //   res.render('edit-address', { address: address,wish,cart });
   } else {
       
-      console.log('Address or HouseNo not found');
+      //console.log('Address or HouseNo not found');
       
   }
   
     
     }
     catch(error){
-      console.log('editAddress',error.message);
+      //console.log('editAddress',error.message);
     }
   
   };
@@ -556,7 +556,7 @@ const addAddress = async (req, res) => {
 //       })
   
 //       if (!addresses) {
-//         console.log('address is not found');
+//         //console.log('address is not found');
 //       }
 //     //   let wish=await wishlistModel.findOne({user:user._id});
 //     //   if(!wish){
@@ -571,7 +571,7 @@ const addAddress = async (req, res) => {
   
 //       if (!addressToEdit) {
         
-//         console.log('Address with type not found')
+//         //console.log('Address with type not found')
 //       }
   
 //       addressToEdit.HouseNo = houseNo;
@@ -590,7 +590,7 @@ const addAddress = async (req, res) => {
   
 //     } catch (err) {
 //       console.error(err);
-//      console.log('editAddress:',err.message)
+//      //console.log('editAddress:',err.message)
 //   }
 //   }
    
@@ -614,7 +614,7 @@ const editAddress = async (req, res) => {
         });
 
         if (!addresses) {
-            console.log('Address is not found');
+            //console.log('Address is not found');
             // Handle the case where addresses are not found
             return res.status(404).send('Address not found');
         }
@@ -622,7 +622,7 @@ const editAddress = async (req, res) => {
         const addressToEdit = addresses.addresses.find(addr => addr.addressType === addressType);
 
         if (!addressToEdit) {
-            console.log('Address with type not found');
+            //console.log('Address with type not found');
             // Handle the case where the specified address type is not found
             return res.status(404).send('Address type not found');
         }
@@ -663,11 +663,11 @@ const deleteAddress=async(req,res)=>{
             });
           }
          
-          //console.log(user);
+          ////console.log(user);
           const addresses = await addressModel.findOne({
             user: user._id
           })
-          // console.log(addresses);
+          // //console.log(addresses);
       
          
       
@@ -685,7 +685,7 @@ const deleteAddress=async(req,res)=>{
       
     }
     catch(error){
-      console.log('deleteAddress',error.message);
+      //console.log('deleteAddress',error.message);
     
     }
     };
@@ -700,7 +700,7 @@ const cancelorder = async (req, res) => {
       }
 
       const order = await orderModel.findOne({ oId });
-      console.log(order,"cancelled order")
+      //console.log(order,"cancelled order")
 
       if (!order) {
           return res.status(404).json({ success: false, error: "Order not found" });
@@ -767,7 +767,7 @@ const returnOrder = async (req, res) => {
 };
 
 const downloadInvoice = async(req,res)=>{
-    console.log("invoice download");
+    //console.log("invoice download");
     try{
         const  {oId}  = req.params;
         const orders = await orderModel.findOne({_id:oId}).populate('user').populate('items.productId');
@@ -810,7 +810,7 @@ const downloadInvoice = async(req,res)=>{
                 </thead>
                 <tbody>
         `;
-console.log(orders,'1111111111111');
+//console.log(orders,'1111111111111');
         orders.items.forEach((item, index) => {
             tableContent += `
                 <tr>
@@ -834,22 +834,22 @@ console.log(orders,'1111111111111');
                 </tbody>
             </table>
         `;
-        console.log(tableContent,addresscontent);
+        //console.log(tableContent,addresscontent);
         const renderedHtml = template( {tableContent,addresscontent} );
 
-        console.log(844);
+        //console.log(844);
         const browser = await puppeteer.launch();
-        console.log(846);
+        //console.log(846);
         const paged = await browser.newPage();
 
-        console.log(849);
+        //console.log(849);
         const marginOptions = {
             top: '1cm',
             bottom: '1cm',
             left: '1cm',
             right: '1cm'
         };
-        console.log(856);
+        //console.log(856);
 
         await paged.setContent(renderedHtml);
         const pdfBuffer = await paged.pdf({
@@ -861,7 +861,7 @@ console.log(orders,'1111111111111');
 
         res.setHeader('Content-Disposition', 'inline; filename="Invoice"');
         res.setHeader('Content-Type', 'application/pdf');
-        console.log("chummmaaaa");
+        //console.log("chummmaaaa");
         res.send(pdfBuffer);
     } catch (error) {
         console.error("Error generating PDF:", error);
@@ -899,7 +899,7 @@ const loadMyProducts = async (req,res)=>{
                 sortOption = { createdAt: -1 }; 
                 break;
         }
-         console.log(category,minamount,maxamount,sort,stock,search,page,"MyData")
+         //console.log(category,minamount,maxamount,sort,stock,search,page,"MyData")
          if(search)
             req.session.search = search;
 
@@ -913,7 +913,7 @@ const loadMyProducts = async (req,res)=>{
             const product = await ProductModel.find({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount},countInStock:{$gte:stock},name: { $regex: new RegExp(search,"i") },description: {$regex: new RegExp(search,"i")}}).sort(sortOption).skip(skip).limit(limit);
             const pro = await ProductModel.countDocuments({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount},countInStock:{$gte:stock},name: { $regex: new RegExp(search,"i") },description: {$regex: new RegExp(search,"i")}});
             // const product = await ProductModel.countDocuments({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount}}).sort(sortOption);
-        //  console.log(category,"mycategory")
+        //  //console.log(category,"mycategory")
          res.status(200).json({message:"success",product,limit,pro})
     }catch(error){
 

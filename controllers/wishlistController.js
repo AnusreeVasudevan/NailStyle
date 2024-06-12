@@ -6,15 +6,15 @@ const { Long } = require('mongodb');
 
 const loadWishlist = async (req, res) => {
     try {
-        console.log("wishlstttttttttttt")
+        //console.log("wishlstttttttttttt")
         let wishlist = await wishlistModel.findOne({ user:req.session.user }).populate({path:"product",model:"Products"});
-        console.log(wishlist,"wishlist");
+        //console.log(wishlist,"wishlist");
         if (!wishlist) {
             wishlist = null;
         }
         res.render('wishlist', { wish: wishlist });
     } catch (error) {
-        console.log(error.message);
+        //console.log(error.message);
     }
 };
 
@@ -38,7 +38,7 @@ const addToWishlist = async (req, res) => {
 
         await wishlist.save();
         res.status(200).send('Product added to wishlist successfully.');
-        console.log("product added successfully");
+        //console.log("product added successfully");
     } catch (err) {
         console.error('addToWishlist:', err.message);
         res.status(500).send('Internal Server Error');

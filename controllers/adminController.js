@@ -14,7 +14,7 @@ const loadLogin = async(req,res)=>{
     try{
         res.render('adminLogin');
     } catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
@@ -23,7 +23,7 @@ const logout = async(req,res)=>{
       req.session.user_id =false;
       res.redirect('/admin');
   }catch(error){
-      console.log(error.message);
+      //console.log(error.message);
   }
 }
 
@@ -32,25 +32,25 @@ const verifyAdmin = async (req, res) => {
   
       const email = req.body.email;
       const password = req.body.password;
-      console.log(email,"emaillllllllllllllllllll");
-      console.log(password);
+      //console.log(email,"emaillllllllllllllllllll");
+      //console.log(password);
       const userData = await User.findOne({ email: email });
-      console.log(userData,'aaaaaaaaaaaaaaaaaaaaaaaaaa');
+      //console.log(userData,'aaaaaaaaaaaaaaaaaaaaaaaaaa');
       if (userData) {
   
         const passwordMatch = await bcrypt.compare(password, userData.password);
   
         if (passwordMatch) {
-          console.log("Yes");
+          //console.log("Yes");
           if (userData.is_admin === 0) {
-            console.log("yess");
+            //console.log("yess");
             res.render('adminlogin', { message: 'Email and password is Incorrect.' });
-            console.log(userData);
+            //console.log(userData);
   
           }
           else {
-            console.log("no");
-            // console.log(userData);
+            //console.log("no");
+            // //console.log(userData);
             req.session.user_id = userData._id;
             res.redirect('/admin/home')
           }
@@ -67,7 +67,7 @@ const verifyAdmin = async (req, res) => {
   
     }
     catch (error) {
-      console.log(error.message);
+      //console.log(error.message);
     }
   }
   
@@ -80,7 +80,7 @@ const verifyAdmin = async (req, res) => {
   
 //     }
 //     catch (error) {
-//       console.log(error.message);
+//       //console.log(error.message);
 //       res.status(500).send('Internal Server Error');
 //     }
 //   }
@@ -88,7 +88,7 @@ const verifyAdmin = async (req, res) => {
 // const loadDashboard = async (req, res) => {
 //     try {
 //         const timeFrame = req.query.timeFrame;
-//         console.log(timeFrame,'timeframe');
+//         //console.log(timeFrame,'timeframe');
 //         let filter = {};
 
 //         if (timeFrame) {
@@ -113,7 +113,7 @@ const verifyAdmin = async (req, res) => {
 //         const orders = await orderModel.find(filter).populate('user');
 //         res.render('adminhome', { orders });
 //     } catch (error) {
-//         console.log(error.message);
+//         //console.log(error.message);
 //         res.status(500).send('Internal Server Error');
 //     }
 // };
@@ -121,7 +121,7 @@ const verifyAdmin = async (req, res) => {
 const loadDashboard = async (req, res) => {
   try {
       const timeFrame = req.query.value;  
-      console.log(timeFrame, 'timeframe');
+      //console.log(timeFrame, 'timeframe');
       let filter = {};
 
       if (timeFrame) {
@@ -129,8 +129,8 @@ const loadDashboard = async (req, res) => {
       }
 
       const orders = await orderModel.find(filter).populate('user');
-      console.log(orders,'orderssss');
-      console.log(timeFrame,'timeframeee');
+      //console.log(orders,'orderssss');
+      //console.log(timeFrame,'timeframeee');
       res.render('adminhome', { orders,timeFrame}); // Adjust view name and data as required
   } catch (error) {
       console.error('Error loading dashboard:', error);
@@ -166,10 +166,10 @@ function timeframeFn(timeFrame){
   const listUser = async(req,res)=>{
     try{
         const userData = await User.find({is_admin:0});
-        console.log(userData);
+        //console.log(userData);
         res.render('userlist',{users:userData});
     }catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
@@ -187,7 +187,7 @@ const blockUser = async (req, res) => {
           res.redirect('/admin/userlist');
       } 
   } catch (error) {
-      console.log(error.message);
+      //console.log(error.message);
       // Handle the error appropriately, e.g., render an error page
       res.status(500).send('Internal Server Error');
   }
@@ -203,31 +203,31 @@ const unblockUser = async (req, res) => {
           // Update the user's status to unblocked
           userData.is_blocked = false;
           await userData.save();
-        console.log("123");
+        //console.log("123");
           // Redirect to the user listing page after unblocking
           res.redirect('/admin/userlist');
       } else {
           // If user data is not found, you may want to handle this case as well
           res.status(404).send('User not found');
-          console.log("456");
+          //console.log("456");
 
       }
   } catch (error) {
-      console.log(error.message);
+      //console.log(error.message);
       // Handle the error appropriately, e.g., render an error page
       res.status(500).send('Internal Server Error');
-      console.log("789");
+      //console.log("789");
   }
 };
 
 const loadCategory = async(req,res)=>{
   try{
     const category = await Category.find({});
-    console.log(category);
+    //console.log(category);
 
       res.render('category',{category});
   } catch(error){
-      console.log(error.message);
+      //console.log(error.message);
   }
 }
 
@@ -236,7 +236,7 @@ const loadorder = async(req,res)=>{
       const order = await orderModel.find({}).populate({path:'user',model:'User'});
       res.render('orders',{order});
     }catch(error){
-      console.log(error.message);
+      //console.log(error.message);
     }
 }
 
@@ -246,7 +246,7 @@ const loadorderdetails = async(req,res)=>{
     const orders = await orderModel.findById(id).populate({path:'user',model:'User'});
     res.render('adminorderdetails',{orders});
   }catch(error){
-    console.log(error.message);
+    //console.log(error.message);
   }
 }
 
@@ -282,13 +282,13 @@ const loadorderdetails = async(req,res)=>{
 
 
 //       for (const orderItem of canceledOrder.items) {
-//         console.log('/////////////////',orderItem);
+//         //console.log('/////////////////',orderItem);
 //           let product = await productModel.findById(orderItem.productId).exec();
-//         console.log('///////product//////////////',product);
-//         console.log('//////////////cout',orderItem.quantity);
+//         //console.log('///////product//////////////',product);
+//         //console.log('//////////////cout',orderItem.quantity);
 //           if (product) {
 //               product.countInStock += orderItem.quantity;
-//               console.log('/////////stock////////',product.countInStock);
+//               //console.log('/////////stock////////',product.countInStock);
 //               await product.save();
 //           }
 //       }
@@ -329,8 +329,8 @@ const requestAccept = async (req, res) => {
     // Iterate over each item in the canceled order to update product stock.
     for (const orderItem of canceledOrder.items) {
       let product = await productModel.findById(orderItem.productId).exec();
-      console.log('Product ID:', orderItem.productId, 'Quantity:', orderItem.quantity);
-      console.log('Product:', product);
+      //console.log('Product ID:', orderItem.productId, 'Quantity:', orderItem.quantity);
+      //console.log('Product:', product);
       if (product) {
         product.countInStock += Number(orderItem.quantity);
         await product.save();
@@ -358,7 +358,7 @@ const requestAccept = async (req, res) => {
             // If no wallet exists for the user, create a new one
             wallet = new walletModel({ user: userId, balance: 0, actions: [] });
           }
-          console.log("haiii",canceledOrder,"cancel order......")
+          //console.log("haiii",canceledOrder,"cancel order......")
           const credit = canceledOrder.billTotal;
           wallet.balance += credit; // Add the credit to the wallet's balance
           wallet.actions.push({
@@ -367,7 +367,7 @@ const requestAccept = async (req, res) => {
             order: canceledOrder._id,
             createdAt: new Date()
           });
-          console.log(wallet,"wallettttt")
+          //console.log(wallet,"wallettttt")
           await wallet.save();
         }
       }
@@ -454,13 +454,13 @@ const updateorder=async(req,res)=>{
       return res.status(200).json({ success: true, message: 'Order status updated successfully', updatedOrder });
   }
   catch(error){
-      console.log('uporder:',error.message);
+      //console.log('uporder:',error.message);
   }
 
 }
 
 const createReport = async(req,res)=>{
-  console.log('entered!!!');
+  //console.log('entered!!!');
   try{
     let filter = {};
     const {timeFrame} = req.body;
@@ -469,7 +469,7 @@ const createReport = async(req,res)=>{
     }
 
     const orders = await orderModel.find(filter).populate('user');
-    console.log(orders,'reqqq');
+    //console.log(orders,'reqqq');
     const htmlContent = fs.readFileSync('./views/admin/order-list-pdf.ejs', 'utf8');
         const template = handlebars.compile(htmlContent);
 
@@ -488,9 +488,9 @@ const createReport = async(req,res)=>{
                 </thead>
                 <tbody>
         `;
-        console.log(orders,'orderssss');
+        //console.log(orders,'orderssss');
         orders.forEach((item, index) => {
-          console.log(item,'order id ');
+          //console.log(item,'order id ');
             tableContent += `
                 <tr>
                 <td>${item.oId}</td>
@@ -539,7 +539,7 @@ const createReport = async(req,res)=>{
 }
 
 const filterProducts = async (req, res) => {
-  console.log("Filtering products");
+  //console.log("Filtering products");
   try {
       let filter = {};
       const type = req.query.type;
@@ -556,7 +556,7 @@ const filterProducts = async (req, res) => {
               { $limit: 10 } // Adjust the limit as needed to show more or fewer products
           ]);
 
-          console.log(productSales, "Product sales");
+          //console.log(productSales, "Product sales");
 
           // Convert aggregated results to product IDs for the query
           const productIds = productSales.map(sale => sale._id);
@@ -587,7 +587,7 @@ const filterProducts = async (req, res) => {
       }
 
       const products = await productModel.find(filter).populate('category');
-      console.log(products,'..............');
+      //console.log(products,'..............');
       res.json({status: true, products });
   } catch (error) {
       console.error("Error filtering products:", error);
@@ -599,7 +599,7 @@ const loadCharts = async(req,res)=>{
   try{
     res.render('dashboard')
   }catch(error){
-    console.log(error.message)
+    //console.log(error.message)
   }
 }
 
@@ -635,7 +635,7 @@ const monthlyData = async(req,res)=>{
     return res.status(200).json({yValues , xValues})
 
   }catch(error){
-    console.log(error.message)
+    //console.log(error.message)
   }
 }
 
@@ -672,7 +672,7 @@ const dailyData = async(req,res)=>{
     return res.status(200).json({yValues , xValues})
 
   }catch(error){
-    console.log(error.message)
+    //console.log(error.message)
   }
 }
 
@@ -746,7 +746,7 @@ const topCategory = async (req, res) => {
           }
       ]);
 
-      console.log(topCategories,"kkk"); // Log the response for debugging
+      //console.log(topCategories,"kkk"); // Log the response for debugging
 
       res.json(topCategories);
   } catch (err) {

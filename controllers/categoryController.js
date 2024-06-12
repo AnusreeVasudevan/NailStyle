@@ -11,9 +11,9 @@ const createCategory = async (req, res) => {
             name: name.toLowerCase(),
         
       });
-      //console.log(existingUser);
+      ////console.log(existingUser);
       if(existingcate ){
-        console.log(existingcate,"existing cat");
+        //console.log(existingcate,"existing cat");
         const categorydetails = await Category.find();
           res.render('category',{category:categorydetails,message:'name is already entered'})
       }
@@ -33,7 +33,7 @@ const createCategory = async (req, res) => {
       
     } catch (error) {
         // Log any errors that occur during the process
-        console.log(error.message);
+        //console.log(error.message);
         // Respond with an error status
         res.status(500).json({ status: false, error: "Internal Server Error" });
     }
@@ -55,7 +55,7 @@ const editCategoryLoad = async (req, res) => {
         }
     } catch (error) {
         // Handle any errors that occur during the process
-        console.log(error.message);
+        //console.log(error.message);
         // You might want to render an error page or send an appropriate response
         res.status(500).send('Internal Server Error');
     }
@@ -67,51 +67,51 @@ const updateCate = async(req,res)=>{
       const Data = await Category.findByIdAndUpdate({_id:req.query.id},{$set:{ discount:req.body.discount,name:req.body.name,description:req.body.description}});
       if(req.body.discount==0){
         //const products = await ProductModel.findByIdAndUpdate({category:req.query.id})
-        //console.log(await ProductModel.find())
+        ////console.log(await ProductModel.find())
         for (const product of products) {
             product.discountPrice = product.price;
             product.discount=0
-            console.log(product.discount)
+            //console.log(product.discount)
             await product.save();
-            console.log(product)
+            //console.log(product)
         }
       }
       else{
         val=(100-Number(val))/100
         const products = await ProductModel.findByIdAndUpdate({category:req.query.id})
-        console.log(products)
+        //console.log(products)
 
         for (const product of products) {
             product.discountPrice = product.price;
             product.discount=percent
             product.discountPrice *= val;
             await product.save();
-            console.log(product)
+            //console.log(product)
 
         }
       }
 
 
-      console.log(Data);
+      //console.log(Data);
       if(Data){
         res.redirect('/admin/category');
       }
       
     }
     catch(error){
-      console.log(error.message);
+      //console.log(error.message);
     }
   };
 
 const deleteCate = async (req, res) => {
     try {
-        console.log("deleted");
+        //console.log("deleted");
         const id = req.query.id;
         // Soft delete by updating the 'is_deleted' field to true
         await Category.findByIdAndUpdate(id, { is_active: false });
         res.redirect('/admin/category');
     } catch (error) {
-        console.log(error.message);
+        //console.log(error.message);
     }
 };
 

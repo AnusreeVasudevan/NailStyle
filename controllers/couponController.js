@@ -19,12 +19,12 @@ const loadcreatecoupon = async(req,res)=>{
     try{
         res.render('createCoupon');
     }catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
 const createCoupon = async (req, res) => {
-    console.log("calling create coupon")
+    //console.log("calling create coupon")
     try {
         const {
             code,
@@ -35,7 +35,7 @@ const createCoupon = async (req, res) => {
             expirationDate,
             maxUsers
         } = req.body;
-        console.log(req.body,'coupon from body');
+        //console.log(req.body,'coupon from body');
         const newCoupon = new couponModel({
             code,
             description,
@@ -47,7 +47,7 @@ const createCoupon = async (req, res) => {
         });
 
         await newCoupon.save();
-        console.log(await newCoupon.save(),"coupon saved");
+        //console.log(await newCoupon.save(),"coupon saved");
 
         res.status(200).json({ success: true, message: "Coupon created successfully." });
         }catch (error) {
@@ -99,7 +99,7 @@ const toggleCouponStatus = async (req, res) => {
 
 //         res.send({ newTotal: userCart.billTotal, message: "Coupon applied successfully." });
 //     } catch (error) {
-//         console.log(error);
+//         //console.log(error);
 //         res.status(500).send({ message: "An error occurred while applying the coupon." });
 //     }
 // };
@@ -107,7 +107,7 @@ const toggleCouponStatus = async (req, res) => {
 // const applycoupon = async (req, res) => {
 //     const { couponCode } = req.body;
 //     const userId = req.session.user;
-//     console.log(couponCode, "couponcode");
+//     //console.log(couponCode, "couponcode");
 
 //     try {
 //         const userCart = await cartModel.findOne({ owner: userId });
@@ -147,7 +147,7 @@ const toggleCouponStatus = async (req, res) => {
 
 //         res.send({ newTotal: userCart.discountPrice, message: "Coupon applied successfully." });
 //     } catch (error) {
-//         console.log(error);
+//         //console.log(error);
 //         res.status(500).send({ message: "An error occurred while applying the coupon." });
 //     }
 // };
@@ -171,7 +171,7 @@ const toggleCouponStatus = async (req, res) => {
 
 //         res.send({ newTotal: userCart.billTotal, message: "Coupon removed successfully." });
 //     } catch (error) {
-//         console.log(error);
+//         //console.log(error);
 //         res.status(500).send({ message: "An error occurred while removing the coupon." });
 //     }
 // };
@@ -218,7 +218,7 @@ const applycoupon = async (req, res) => {
 
         res.send({ newTotal: userCart.discountPrice, appliedCoupon: couponCode, message: "Coupon applied successfully." });
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         res.status(500).send({ message: "An error occurred while applying the coupon." });
     }
 };
@@ -242,7 +242,7 @@ const removeCoupon = async (req, res) => {
 
         res.send({ newTotal: userCart.billTotal, message: "Coupon removed successfully." });
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         res.status(500).send({ message: "An error occurred while removing the coupon." });
     }
 };

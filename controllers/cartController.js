@@ -29,7 +29,7 @@ const loadAndShowCart = async (req, res) => {
         
         res.render('cart', { cart: userCart, coupon: eligibleCoupons, wish });
     } catch (err) {
-        console.log('loadAndShowCart:', err.message);
+        //console.log('loadAndShowCart:', err.message);
         res.status(500).send('Error loading cart');
     }
 }
@@ -39,12 +39,12 @@ const addTocart = async (req, res) => {
     try {
         const productId = req.body.productId;
         const product = await productModel.findById(productId);
-        console.log(product);
+        //console.log(product);
         if (!product) {
-            console.log('Product is not found');
+            //console.log('Product is not found');
             return res.status(404).json({ message: 'Product not found' });
         }
-        console.log(req.session.user);
+        //console.log(req.session.user);
         let userCart = await cartModel.findOne({ owner: req.session.user })
         if (!userCart) {
             userCart = new cartModel({
@@ -61,7 +61,7 @@ const addTocart = async (req, res) => {
             if (existingCartItem.quantity < product.countInStock && existingCartItem.quantity < 5) {
                 existingCartItem.quantity += 1;
                 existingCartItem.price = existingCartItem.quantity * product.discountPrice;
-                console.log(existingCartItem.price);
+                //console.log(existingCartItem.price);
             } else if (existingCartItem.quantity + 1 > product.countInStock) {
                 return res.status(409).json({ message: 'Stock Limit Exceeded' });
             } else {
@@ -78,14 +78,14 @@ const addTocart = async (req, res) => {
         userCart.billTotal = userCart.items.reduce((total, item) => total + item.price, 0);
 
         await userCart.save();
-        console.log("added to cart")
+        //console.log("added to cart")
         const hloo = await cartModel.findOne({ owner: req.session.user }).populate({ path: 'items.productId', model: 'Products' });
 
         
-        console.log("cartttttt", hloo);
+        //console.log("cartttttt", hloo);
         return res.status(200).json({ message: 'Added to cart' });
     } catch (err) {
-        console.log('Error adding to cart:', err.message);
+        //console.log('Error adding to cart:', err.message);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -107,7 +107,7 @@ const addTocart = async (req, res) => {
 
 //         // Check if adding 1 to the quantity would exceed the maximum allowed quantity
 //         if (item.quantity >= 5) {
-//             console.log("maximum quantity");
+//             //console.log("maximum quantity");
 //             return res.status(200).json({ message: 'Maximum quantity reached' });
 //         }
 
@@ -137,7 +137,7 @@ const addTocart = async (req, res) => {
 //         // Save the cart
 //         await cart.save();
 
-//         console.log(cart);
+//         //console.log(cart);
 //         return res.status(200).json({ message: 'Quantity increased', cart });
 //     } catch (err) {
 //         console.error(err.message);
@@ -182,7 +182,7 @@ const addTocart = async (req, res) => {
 //             // Save the cart
 //             await cart.save();
 
-//             console.log(cart);
+//             //console.log(cart);
 //             return res.status(200).json({ message: 'Quantity decreased', cart });
 //         } else {
 //             return res.status(400).json({ message: 'Minimum quantity reached' });
@@ -216,7 +216,7 @@ const increaseQuantity = async (req, res) => {
 
         // Check if adding 1 to the quantity would exceed the maximum allowed quantity
         if (item.quantity >= 5) {
-            console.log("maximum quantity");
+            //console.log("maximum quantity");
             return res.json({status:"maximum" ,message: 'Maximum quantity reached' });
         }
 
@@ -246,7 +246,7 @@ const increaseQuantity = async (req, res) => {
         // Save the cart
         await cart.save();
 
-        console.log(cart);
+        //console.log(cart);
         return res.status(200).json({ message: 'Quantity increased', cart });
     } catch (err) {
         console.error(err.message);
@@ -291,7 +291,7 @@ const decreaseQuantity = async (req, res) => {
             // Save the cart
             await cart.save();
 
-            console.log(cart);
+            //console.log(cart);
             return res.status(200).json({ message: 'Quantity decreased', cart });
         } else {
             return res.json({status:'Minimum', message: 'Minimum quantity reached' });

@@ -31,7 +31,7 @@ const loadcheckout = async (req, res) => {
         
     }
     catch (error) {
-        console.log('loadcheckout', error.message);
+        //console.log('loadcheckout', error.message);
     }
 
 };
@@ -40,12 +40,12 @@ const loadcheckout = async (req, res) => {
 
 const razorpayFn = async (req, res) => {
     try {
-        console.log('Entered in the function');
+        //console.log('Entered in the function');
 
         const { a_id, pay } = req.body.data;
         
         const cart=await cartModel.findOne({owner:req.session.user}).populate('items.productId');
-      console.log(cart,'........');
+      //console.log(cart,'........');
 
         // Fetch the specific address
         const address = await addressModel.findOne({
@@ -55,14 +55,14 @@ const razorpayFn = async (req, res) => {
             'addresses.$': 1 // Use the positional $ operator to fetch only the matching address
         });
 
-        console.log(address, 'Got address');
+        //console.log(address, 'Got address');
 
         // Populate cart items with product details
         
 
         // Generate a unique order ID
         const order_id = await generateUniqueOrderID();
-        console.log(process.env.rzId, "Razorpay Key ID", cart.billTotal, "Cart bill total");
+        //console.log(process.env.rzId, "Razorpay Key ID", cart.billTotal, "Cart bill total");
 
         const url = `orderconfirmed?id=${order_id}`;
         const instance = new Razorpay({ key_id: process.env.rzKey, key_secret: process.env.rzId });
@@ -72,7 +72,7 @@ const razorpayFn = async (req, res) => {
             currency: "INR",
             receipt: order_id
         };
-        console.log(options, 'Payment options');
+        //console.log(options, 'Payment options');
 
         // Create an order in Razorpay
         const order = await new Promise((resolve, reject) => {
@@ -85,7 +85,7 @@ const razorpayFn = async (req, res) => {
             });
         });
 
-        console.log(order, "Razorpay order created");
+        //console.log(order, "Razorpay order created");
 
         const orderData = new orderModel({
             user: req.session.user,
@@ -97,7 +97,7 @@ const razorpayFn = async (req, res) => {
             discountPrice: cart.discountPrice
         });
 
-        console.log(orderData, "Order data before adding items");
+        //console.log(orderData, "Order data before adding items");
 
         // Add items to the order
         for (const item of cart.items) {
@@ -112,7 +112,7 @@ const razorpayFn = async (req, res) => {
         }
         await orderData.save();
 
-        console.log(orderData, "Order data after adding items");
+        //console.log(orderData, "Order data after adding items");
 
         // Save the order
        
@@ -133,7 +133,7 @@ const razorpayFn = async (req, res) => {
         await cart.save();
 
         const resurl = orderData._id;
-        console.log(resurl, "Response URL");
+        //console.log(resurl, "Response URL");
 
         res.json({ order, resurl });
 
@@ -158,7 +158,7 @@ const razorpayFn = async (req, res) => {
 
 //     const url=`orderconfirmed?id=${order_id}`
 
-//             console.log(address,a_id);
+//             //console.log(address,a_id);
 
 
 //             const orderData = new orderModel({
@@ -191,7 +191,7 @@ const razorpayFn = async (req, res) => {
 
 // const razorpayFn = async (req, res) => {
 //     try {
-//         console.log('Entered in the function');
+//         //console.log('Entered in the function');
 //         const { a_id, pay } = req.body.data;
 //         const { user, c_id } = req.session;
 
@@ -208,7 +208,7 @@ const razorpayFn = async (req, res) => {
 //             return res.status(404).send('Address not found');
 //         }
 
-//         console.log(address, 'got address');
+//         //console.log(address, 'got address');
 
 //         // Fetch cart
 //         const cart=await cartModel.findOne(c_id).populate('items.productId')
@@ -217,7 +217,7 @@ const razorpayFn = async (req, res) => {
 //             return res.status(404).send('Cart not found');
 //         }
 
-//         console.log(process.env.rzId, "Razorpay ID", cart.billTotal, "cart bill");
+//         //console.log(process.env.rzId, "Razorpay ID", cart.billTotal, "cart bill");
 
 //         // Generate unique order ID
 //         const order_id = await generateUniqueOrderID();
@@ -229,7 +229,7 @@ const razorpayFn = async (req, res) => {
 //             receipt: order_id,
 //         });
 
-//         console.log(address, a_id, 'address, a_id');
+//         //console.log(address, a_id, 'address, a_id');
 
 //         // Create order data in DB
 //         const orderData = new orderModel({
@@ -256,7 +256,7 @@ const razorpayFn = async (req, res) => {
 
 //         // Save orderData
 //         await orderData.save();
-//         console.log("!!!!!", orderData, 'order data');
+//         //console.log("!!!!!", orderData, 'order data');
 
 //         // Update session
 //         req.session.orderId = orderData._id;
@@ -286,11 +286,11 @@ const razorpayFn = async (req, res) => {
 const codFn = async (req, res) => {
     const { a_id, pay } = req.body.data;
     const { user, c_id } = req.session;
-    console.log(289,req.session.user);
+    //console.log(289,req.session.user);
     const cart = await cartModel.findOne({owner:user}).populate('items.productId');
 
 
-    console.log(292,cart);
+    //console.log(292,cart);
     if (pay === 'COD') {
 
         // Check if the total bill is above Rs 1000 and if payment method is COD
@@ -349,8 +349,8 @@ const codFn = async (req, res) => {
     cart.items = [];
     await cart.save();
 
-    console.log(350, cart)
-    console.log(351,orderData)
+    //console.log(350, cart)
+    //console.log(351,orderData)
     const url = `orderconfirmed?id=${orderData._id}`;
     res.json({ url });
 };
@@ -423,15 +423,15 @@ const payment = async(req,res)=>{
     try{
         const id = req.session.orderId;
         const order = await orderModel.findOne({_id:id}).populate( 'items.productId' );
-        console.log(order,"order");
+        //console.log(order,"order");
         const razor = req.query.razor;
-        console.log(order,"order before saving");
+        //console.log(order,"order before saving");
         order.payId = razor;
         await order.save();
-        console.log(order,"after",razor,"order after saving");
+        //console.log(order,"after",razor,"order after saving");
         res.redirect(`orderconfirmed?id=${order._id}`);
     }catch(error){
-        console.log(error.message);
+        //console.log(error.message);
     }
 }
 
@@ -526,7 +526,7 @@ const Postcheckout = async (req, res) => {
         await cart.save();
 
     } catch (error) {
-        console.log('Post checkout error:', error);
+        //console.log('Post checkout error:', error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -538,11 +538,11 @@ const loadorderdetails = async (req, res) => {
         const order = await orderModel.findOne({ _id: orderId }).populate('items.productId');
         // const user = await User.findById(req.session.user);
 
-        // console.log(order);
+        // //console.log(order);
         req.session.order = orderId;
         res.render('orderdetails', { order });
     } catch (error) {
-        console.log('loadorderdetails Error:', error.message);
+        //console.log('loadorderdetails Error:', error.message);
     }
 };
 
@@ -614,16 +614,16 @@ const razorpayVerify = async (req, res) => {
         // } 
 
     } catch (err) {
-        console.log(err.message);
+        //console.log(err.message);
         return res.status(500).send("Internal Server Error");
     }
 }
 
 // const revisePayment = async(req,res)=>{
 //     try{
-//         console.log(req.session.order);
+//         //console.log(req.session.order);
 //         const orders = await orderModel.findOne({_id:req.session.order});
-//         console.log(orders,"orders vannu");
+//         //console.log(orders,"orders vannu");
 //         const order = await instance.orders.create({
 //             amount: orders.billTotal * 100, 
 //             currency: "INR",
@@ -631,29 +631,29 @@ const razorpayVerify = async (req, res) => {
 //        });
         
 
-//         console.log(order+'kittum');
+//         //console.log(order+'kittum');
 //         res.json({order})
 //     }catch(error){
-//         console.log(error.message);
+//         //console.log(error.message);
 //     }
 // }
 
 const revisePayment = async (req, res) => {
     try {
-        console.log("----------------------")
+        //console.log("----------------------")
         const orderId = req.session.order;
-        console.log(orderId)
+        //console.log(orderId)
         if (!orderId) {
             return res.status(400).json({ message: 'Order ID not found in session.' });
         }
 
-        console.log(646);
+        //console.log(646);
         const orders = await orderModel.findOne({ _id: orderId });
-        console.log(648);
+        //console.log(648);
         if (!orders) {
             return res.status(404).json({ message: 'Order not found.' });
         }
-        console.log(650,orders)
+        //console.log(650,orders)
 
         const instance = new Razorpay({ key_id: process.env.rzKey, key_secret: process.env.rzId });
 
@@ -662,7 +662,7 @@ const revisePayment = async (req, res) => {
             currency: "INR",
             receipt: orders.oId
         };
-        console.log(options, 'Payment options');
+        //console.log(options, 'Payment options');
 
         // Create an order in Razorpay
         const order = await new Promise((resolve, reject) => {
@@ -674,8 +674,8 @@ const revisePayment = async (req, res) => {
                 }
             });
         });
-        console.log(667)
-        console.log(order);
+        //console.log(667)
+        //console.log(order);
         req.session.orderId=orders._id
 
         res.json({ order });
@@ -691,9 +691,9 @@ const wallet = async (req, res) => {
     const { user, c_id } = req.session;
     const wallet=await walletModel.findOne({user:user})
     const cart = await cartModel.findOne({owner:req.session.user}).populate('items.productId');
-    console.log(694,cart);
+    //console.log(694,cart);
     if(cart.billTotal>wallet.balance){
-        console.log(696)
+        //console.log(696)
         const url = `checkout`;
 
     
@@ -767,7 +767,7 @@ const wallet = async (req, res) => {
     // Clear the cart
     cart.items = [];
     await cart.save();
-    console.log(orderData)
+    //console.log(orderData)
     const url = `orderconfirmed?id=${orderData._id}`;
 
     res.json({ url });

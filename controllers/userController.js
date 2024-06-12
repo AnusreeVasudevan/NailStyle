@@ -839,8 +839,7 @@ const downloadInvoice = async(req,res)=>{
 
         //console.log(844);
         const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            ignoreDefaultArgs: ['--disable-extensions'],
           });
                   console.log(846);
         const paged = await browser.newPage();

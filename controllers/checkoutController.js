@@ -23,7 +23,6 @@ const loadcheckout = async (req, res) => {
         }).populate({ path: 'items.productId', model: 'Products' }) || null;
         req.session.cart=cart._id
         const user = await User.findById(req.session.user);
-        console.log(user, address, cart);
         if(cart.items.length !== 0){
             res.render('checkout', { user, address, cart, wallet });
         }else{
@@ -644,29 +643,36 @@ const revisePayment = async (req, res) => {
             return res.status(400).json({ message: 'Order ID not found in session.' });
         }
 
+        console.log(646);
         const orders = await orderModel.findOne({ _id: orderId });
+        console.log(648);
         if (!orders) {
             return res.status(404).json({ message: 'Order not found.' });
         }
-        console.log(orders.billTotal,"came")
+        console.log(650,orders)
 
-        var options = {
-            amount: orders.billTotal*100,
+        const instance = new Razorpay({ key_id: process.env.rzKey, key_secret: process.env.rzId });
+
+        const options = {
+            amount: orders.billTotal * 100, // Razorpay accepts amount in paise
             currency: "INR",
-            receipt: await generateUniqueOrderID(),
-            };
-    console.log(options)
-            const order = await new Promise((resolve, reject) => {
-                instance.orders.create(options, (err, order) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(order);
-                    }
-                });
+            receipt: orders.oId
+        };
+        console.log(options, 'Payment options');
+
+        // Create an order in Razorpay
+        const order = await new Promise((resolve, reject) => {
+            instance.orders.create(options, (err, order) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(order);
+                }
             });
-        console.log("============================")
+        });
+        console.log(667)
         console.log(order);
+        req.session.orderId=orders._id
 
         res.json({ order });
     } catch (error) {
@@ -680,7 +686,7 @@ const wallet = async (req, res) => {
     const { a_id, pay } = req.body.data;
     const { user, c_id } = req.session;
     const wallet=await walletModel.findOne({user:user})
-    const cart = await cartModel.findOne(c_id).populate('items.productId');
+    const cart = await cartModel.findOne({owner:req.session.user}).populate('items.productId');
 
     
 
@@ -717,6 +723,7 @@ const wallet = async (req, res) => {
         })
     }
 
+
     await orderData.save();
         wallet.balance-=cart.billTotal
         wallet.actions.push({
@@ -747,6 +754,7 @@ const wallet = async (req, res) => {
     // Clear the cart
     cart.items = [];
     await cart.save();
+    console.log(orderData)
     const url = `orderconfirmed?id=${orderData._id}`;
 
     res.json({ url });

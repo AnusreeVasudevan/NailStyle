@@ -8,7 +8,6 @@ const loadProduct = async (req, res) => {
 
         const productdetails = await productModel.find().populate('category');
         const categorydetails = await categoryModel.find();
-        console.log(productdetails,"detailspdt");
         res.render('listProduct', { product: productdetails, category: categorydetails, message: null });
     } catch (error) {
         console.log(error.message)
@@ -149,7 +148,6 @@ const loadIndividualProduct = async (req, res) => {
         const id = req.query.id;
  
         const userId = req.session.user; 
-        console.log(id,"myproductsid")
         let productData = await productModel.find({_id:id}).populate('category')
         productData=productData[0]
         console.log(productData,"aaaaaaaa")

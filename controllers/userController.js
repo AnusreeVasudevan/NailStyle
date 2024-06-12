@@ -165,8 +165,6 @@ const verifyLogin = async(req,res)=>{
         }
         if(email===userData.email && hashedPassword ){
             req.session.user = userData._id;
-            console.log(req.session.user);
-            console.log("OKOKOKOK")
             res.redirect('/home');
         }
         
@@ -915,7 +913,6 @@ const loadMyProducts = async (req,res)=>{
             const pro = await ProductModel.countDocuments({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount},countInStock:{$gte:stock},name: { $regex: new RegExp(search,"i") },description: {$regex: new RegExp(search,"i")}});
             // const product = await ProductModel.countDocuments({is_deleted:false,category:category,discountPrice:{$gte:minamount,$lte:maxamount}}).sort(sortOption);
         //  console.log(category,"mycategory")
-         console.log(product,"MyProducts")
          res.status(200).json({message:"success",product,limit,pro})
     }catch(error){
 

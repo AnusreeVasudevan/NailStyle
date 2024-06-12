@@ -165,6 +165,7 @@ const verifyLogin = async(req,res)=>{
         }
         if(email===userData.email && hashedPassword ){
             req.session.user = userData._id;
+            console.log(168,req.session.user);
             res.redirect('/home');
         }
         

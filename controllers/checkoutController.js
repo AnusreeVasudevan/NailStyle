@@ -286,8 +286,11 @@ const razorpayFn = async (req, res) => {
 const codFn = async (req, res) => {
     const { a_id, pay } = req.body.data;
     const { user, c_id } = req.session;
-    const cart = await cartModel.findOne(c_id).populate('items.productId');
+    console.log(289,req.session.user);
+    const cart = await cartModel.findOne({owner:user}).populate('items.productId');
 
+
+    console.log(292,cart);
     if (pay === 'COD') {
 
         // Check if the total bill is above Rs 1000 and if payment method is COD
@@ -319,6 +322,7 @@ const codFn = async (req, res) => {
         cart: cart._id,
         billTotal: cart.billTotal,
         oId: order_id,
+        payId: "NA"
     });
     for (const item of cart.items) {
         orderData.items.push({
@@ -344,6 +348,9 @@ const codFn = async (req, res) => {
     // Clear the cart
     cart.items = [];
     await cart.save();
+
+    console.log(350, cart)
+    console.log(351,orderData)
     const url = `orderconfirmed?id=${orderData._id}`;
     res.json({ url });
 };
@@ -396,11 +403,8 @@ const loadorderconfirmed = async (req, res) => {
     try {
         // Retrieve the order details using the order ID from the query string
         const orderId = req.query.id;
-        console.log(orderId,"id order in confirm");
         const order = await orderModel.findOne({ _id: orderId }).populate('items.productId');
-        console.log(order,'order is there')
         const cart = await cartModel.findOne({ owner: req.session.user })
-        console.log(req.session.user,"session user")
         if (!order) {
             // Handle the case where an order is not found
             return res.status(404).render('errorPage', { message: "Order not found" });
@@ -687,6 +691,7 @@ const wallet = async (req, res) => {
     const { user, c_id } = req.session;
     const wallet=await walletModel.findOne({user:user})
     const cart = await cartModel.findOne({owner:req.session.user}).populate('items.productId');
+    console.log(694,cart);
 
     
 

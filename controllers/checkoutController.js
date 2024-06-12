@@ -692,6 +692,13 @@ const wallet = async (req, res) => {
     const wallet=await walletModel.findOne({user:user})
     const cart = await cartModel.findOne({owner:req.session.user}).populate('items.productId');
     console.log(694,cart);
+    if(cart.billTotal>wallet.balance){
+        console.log(696)
+        const url = `checkout`;
+
+    
+        return res.json({ url });
+    }
 
     
 
@@ -716,6 +723,7 @@ const wallet = async (req, res) => {
         cart: cart._id,
         billTotal: cart.billTotal,
         oId: order_id,
+        payid: "NA"
     });
     for (const item of cart.items) {
         orderData.items.push({

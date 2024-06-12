@@ -838,8 +838,10 @@ const downloadInvoice = async(req,res)=>{
         const renderedHtml = template( {tableContent,addresscontent} );
 
         //console.log(844);
-        const browser = await puppeteer.launch();
-        //console.log(846);
+        const browser = await puppeteer.launch({
+            executablePath: '/usr/bin/chromium-browser'
+          })
+                  console.log(846);
         const paged = await browser.newPage();
 
         //console.log(849);

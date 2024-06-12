@@ -840,7 +840,6 @@ const downloadInvoice = async(req,res)=>{
         //console.log(844);
         const browser = await puppeteer.launch({
             headless: true,
-           executablePath:'/home/sagar/workplace/scraping-demo/node_modules/puppeteer/.local-chromium/linux-599821/chrome-linux/chrome',
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
           });
                   console.log(846);
